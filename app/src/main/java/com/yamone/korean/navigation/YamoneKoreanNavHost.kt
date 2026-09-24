@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.yamone.korean.ui.screens.HomeScreen
+import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
@@ -70,17 +71,26 @@ fun YamoneKoreanNavHost(
         learningDestinations.forEachIndexed { index, destination ->
             composable(destination.route) {
                 val nextDestination = learningDestinations.getOrNull(index + 1)
-                LearningStageScreen(
-                    destination = destination,
-                    onNext = nextDestination?.let { next ->
-                        {
-                            scope.launch {
-                                onStageOpened(next.route)
-                                navController.navigate(next.route)
-                            }
+                val onNext: (() -> Unit)? = nextDestination?.let { next ->
+                    {
+                        scope.launch {
+                            onStageOpened(next.route)
+                            navController.navigate(next.route)
                         }
-                    },
-                )
+                    }
+                }
+
+                if (destination == AppDestination.Jamo) {
+                    JamoScreen(
+                        languageCode = initialLanguageCode,
+                        onContinue = onNext ?: {},
+                    )
+                } else {
+                    LearningStageScreen(
+                        destination = destination,
+                        onNext = onNext,
+                    )
+                }
             }
         }
 
