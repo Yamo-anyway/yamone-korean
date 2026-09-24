@@ -16,6 +16,7 @@ fun YamoneKoreanNavHost(
     navController: NavHostController,
     initialLanguageCode: String?,
     onExplanationLanguageSelected: suspend (String) -> Unit,
+    onStageOpened: suspend (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val startDestination = if (initialLanguageCode == null) {
@@ -55,7 +56,10 @@ fun YamoneKoreanNavHost(
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onOpenDestination = { destination ->
-                    navController.navigate(destination.route)
+                    scope.launch {
+                        onStageOpened(destination.route)
+                        navController.navigate(destination.route)
+                    }
                 },
                 onOpenSettings = {
                     navController.navigate(AppDestination.Settings.route)
@@ -69,7 +73,12 @@ fun YamoneKoreanNavHost(
                 LearningStageScreen(
                     destination = destination,
                     onNext = nextDestination?.let { next ->
-                        { navController.navigate(next.route) }
+                        {
+                            scope.launch {
+                                onStageOpened(next.route)
+                                navController.navigate(next.route)
+                            }
+                        }
                     },
                 )
             }

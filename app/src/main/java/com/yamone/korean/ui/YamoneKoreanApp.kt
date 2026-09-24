@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.yamone.korean.data.LanguagePreferenceState
+import com.yamone.korean.data.LearningProgressRepository
 import com.yamone.korean.data.UserPreferencesRepository
 import com.yamone.korean.navigation.YamoneKoreanNavHost
 import com.yamone.korean.ui.components.BannerAdSlot
@@ -25,6 +26,9 @@ fun YamoneKoreanApp() {
     val context = LocalContext.current
     val preferencesRepository = remember(context) {
         UserPreferencesRepository(context.applicationContext)
+    }
+    val learningProgressRepository = remember(context) {
+        LearningProgressRepository(context.applicationContext)
     }
     val languagePreference by preferencesRepository.languagePreference.collectAsState(
         initial = LanguagePreferenceState(),
@@ -55,6 +59,9 @@ fun YamoneKoreanApp() {
                             initialLanguageCode = languagePreference.languageCode,
                             onExplanationLanguageSelected = { languageCode ->
                                 preferencesRepository.setExplanationLanguage(languageCode)
+                            },
+                            onStageOpened = { stageRoute ->
+                                learningProgressRepository.setCurrentPosition(stageRoute)
                             },
                         )
                     }
