@@ -27,13 +27,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.yamone.korean.learning.GiyeokTraceRule
+import com.yamone.korean.learning.BasicTraceCatalog
 import com.yamone.korean.learning.NormalizedPoint
+import com.yamone.korean.learning.TraceEvaluator
 
 @Composable
 fun TraceScreen(
     onContinue: () -> Unit,
 ) {
+    val lesson = remember { BasicTraceCatalog.giyeok }
     val completedStrokes = remember { mutableStateListOf<List<Offset>>() }
     var activeStroke by remember { mutableStateOf<List<Offset>>(emptyList()) }
     var passed by remember { mutableStateOf(false) }
@@ -48,11 +50,11 @@ fun TraceScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "Touch writing",
+            text = "Touch writing · ${lesson.symbol}",
             style = MaterialTheme.typography.headlineMedium,
         )
         Text(
-            text = "Trace ㄱ with your finger. Start at the dot, move right, then down.",
+            text = lesson.instruction,
             style = MaterialTheme.typography.bodyLarge,
         )
 
@@ -69,36 +71,47 @@ fun TraceScreen(
                 .fillMaxWidth()
                 .weight(1f)
                 .aspectRatio(1f)
-                .pointerInput(Unit) {
+                .pointerInput(lesson.id) {
                     detectDragGestures(
                         onDragStart = {
+                            if (completedStrokes.size >= lesson.strokes.size) {
+                                completedStrokes.clear()
+                            }
                             activeStroke = listOf(it)
                             passed = false
                             feedback = null
                         },
                         onDragEnd = {
-                            if (activeStroke.size > 1) {
-                                completedStrokes.add(activeStroke)
-                                if (completedStrokes.size > 1) {
-                                    passed = false
-                                    feedback = "Use one continuous stroke for ㄱ."
-                                } else {
-                                    val points = activeStroke.map { point ->
+                            val finishedStroke = activeStroke
+                            activeStroke = emptyList()
+
+                            if (finishedStroke.size > 1) {
+                                completedStrokes.add(finishedStroke)
+                            }
+
+                            if (completedStrokes.size == lesson.strokes.size) {
+                                val normalizedStrokes = completedStrokes.map { stroke ->
+                                    stroke.map { point ->
                                         NormalizedPoint(
                                             x = point.x / size.width.toFloat(),
                                             y = point.y / size.height.toFloat(),
                                         )
                                     }
-                                    val result = GiyeokTraceRule.assess(points)
-                                    passed = result.passed
-                                    feedback = if (result.passed) {
-                                        "Great! ㄱ was traced correctly."
-                                    } else {
-                                        traceFeedback(result.reason)
-                                    }
                                 }
+                                val result = TraceEvaluator.assess(
+                                    strokes = normalizedStrokes,
+                                    lesson = lesson,
+                                )
+                                passed = result.passed
+                                feedback = if (result.passed) {
+                                    "Great! ${lesson.symbol} was traced correctly."
+                                } else {
+                                    traceFeedback(result.reason, result.strokeIndex)
+                                }
+                            } else if (completedStrokes.isNotEmpty()) {
+                                feedback =
+                                    "Stroke ${completedStrokes.size} of ${lesson.strokes.size} complete."
                             }
-                            activeStroke = emptyList()
                         },
                         onDragCancel = {
                             activeStroke = emptyList()
@@ -109,29 +122,38 @@ fun TraceScreen(
                     )
                 },
         ) {
-            val left = size.width * 0.24f
-            val top = size.height * 0.28f
-            val right = size.width * 0.72f
-            val bottom = size.height * 0.74f
-            val guidePath = Path().apply {
-                moveTo(left, top)
-                lineTo(right, top)
-                lineTo(right, bottom)
-            }
+            lesson.strokes.forEach { stroke ->
+                val guidePoints = stroke.guidePath.map { point ->
+                    Offset(
+                        x = point.x * size.width,
+                        y = point.y * size.height,
+                    )
+                }
+                if (guidePoints.size >= 2) {
+                    val guidePath = Path().apply {
+                        moveTo(guidePoints.first().x, guidePoints.first().y)
+                        guidePoints.drop(1).forEach { point ->
+                            lineTo(point.x, point.y)
+                        }
+                    }
+                    drawPath(
+                        path = guidePath,
+                        color = guideColor,
+                        style = Stroke(
+                            width = size.minDimension * 0.055f,
+                            cap = StrokeCap.Round,
+                        ),
+                    )
+                }
 
-            drawPath(
-                path = guidePath,
-                color = guideColor,
-                style = Stroke(
-                    width = size.minDimension * 0.055f,
-                    cap = StrokeCap.Round,
-                ),
-            )
-            drawCircle(
-                color = writingColor,
-                radius = size.minDimension * 0.025f,
-                center = Offset(left, top),
-            )
+                guidePoints.firstOrNull()?.let { start ->
+                    drawCircle(
+                        color = writingColor,
+                        radius = size.minDimension * 0.025f,
+                        center = start,
+                    )
+                }
+            }
 
             fun drawStroke(points: List<Offset>) {
                 for (index in 1 until points.size) {
@@ -176,14 +198,20 @@ fun TraceScreen(
     }
 }
 
-private fun traceFeedback(reason: String): String = when (reason) {
-    "too_short" -> "Draw the whole ㄱ in one continuous stroke."
-    "start_position" -> "Start closer to the dot."
-    "corner_position" -> "Turn downward near the top-right corner."
-    "move_right_first" -> "First move to the right."
-    "move_down_second" -> "After the corner, move down."
-    "vertical_alignment" -> "Keep the second part more vertical."
-    "guide_deviation" -> "Stay closer to the guide line."
-    "end_position" -> "Finish near the bottom of the guide."
-    else -> "Try tracing ㄱ again."
+private fun traceFeedback(
+    reason: String,
+    strokeIndex: Int?,
+): String {
+    val prefix = strokeIndex?.let { "Stroke ${it + 1}: " }.orEmpty()
+    val message = when (reason) {
+        "stroke_count" -> "Follow the displayed stroke count."
+        "too_short" -> "Draw the whole stroke."
+        "start_position" -> "Start closer to the dot."
+        "checkpoint_order" -> "Follow the guide in order."
+        "guide_deviation" -> "Stay closer to the guide line."
+        "end_position" -> "Finish near the end of the guide."
+        "invalid_guide" -> "This lesson guide is not ready yet."
+        else -> "Try tracing again."
+    }
+    return prefix + message
 }
