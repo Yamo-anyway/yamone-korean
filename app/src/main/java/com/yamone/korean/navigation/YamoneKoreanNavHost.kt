@@ -10,6 +10,7 @@ import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
+import com.yamone.korean.ui.screens.TraceScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,16 +81,26 @@ fun YamoneKoreanNavHost(
                     }
                 }
 
-                if (destination == AppDestination.Jamo) {
-                    JamoScreen(
-                        languageCode = initialLanguageCode,
-                        onContinue = onNext ?: {},
-                    )
-                } else {
-                    LearningStageScreen(
-                        destination = destination,
-                        onNext = onNext,
-                    )
+                when (destination) {
+                    AppDestination.Jamo -> {
+                        JamoScreen(
+                            languageCode = initialLanguageCode,
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Trace -> {
+                        TraceScreen(
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    else -> {
+                        LearningStageScreen(
+                            destination = destination,
+                            onNext = onNext,
+                        )
+                    }
                 }
             }
         }

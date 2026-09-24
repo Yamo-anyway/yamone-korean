@@ -1,1 +1,0 @@
-Touch-writing implementation step placeholder.
