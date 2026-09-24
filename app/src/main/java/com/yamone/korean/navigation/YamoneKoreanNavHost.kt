@@ -1,6 +1,7 @@
 package com.yamone.korean.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -8,20 +9,44 @@ import com.yamone.korean.ui.screens.HomeScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun YamoneKoreanNavHost(
     navController: NavHostController,
+    initialLanguageCode: String?,
+    onExplanationLanguageSelected: suspend (String) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val startDestination = if (initialLanguageCode == null) {
+        AppDestination.Language.route
+    } else {
+        AppDestination.Home.route
+    }
+
     NavHost(
         navController = navController,
-        startDestination = AppDestination.Language.route,
+        startDestination = startDestination,
     ) {
         composable(AppDestination.Language.route) {
             LanguageSelectionScreen(
-                onLanguageSelected = {
-                    navController.navigate(AppDestination.Home.route) {
-                        popUpTo(AppDestination.Language.route) { inclusive = true }
+                onLanguageSelected = { languageCode ->
+                    val isFirstLanguageSelection = initialLanguageCode == null
+
+                    scope.launch {
+                        onExplanationLanguageSelected(languageCode)
+
+                        if (isFirstLanguageSelection) {
+                            navController.navigate(AppDestination.Home.route) {
+                                popUpTo(AppDestination.Language.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            navController.navigate(AppDestination.Home.route) {
+                                popUpTo(AppDestination.Home.route) { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 },
             )
