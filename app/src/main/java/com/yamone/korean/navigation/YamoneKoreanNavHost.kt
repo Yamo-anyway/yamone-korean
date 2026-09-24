@@ -5,6 +5,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.yamone.korean.data.LearningProgressState
 import com.yamone.korean.ui.screens.HomeScreen
 import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
@@ -17,14 +18,18 @@ import kotlinx.coroutines.launch
 fun YamoneKoreanNavHost(
     navController: NavHostController,
     initialLanguageCode: String?,
+    learningProgress: LearningProgressState,
     onExplanationLanguageSelected: suspend (String) -> Unit,
     onStageOpened: suspend (String) -> Unit,
+    onLessonOpened: suspend (String, String) -> Unit,
+    onLessonCompleted: suspend (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val startDestination = if (initialLanguageCode == null) {
-        AppDestination.Language.route
-    } else {
-        AppDestination.Home.route
+    val startDestination = when {
+        initialLanguageCode == null -> AppDestination.Language.route
+        learningProgress.currentStageRoute == AppDestination.Trace.route &&
+            learningProgress.currentLessonId != null -> AppDestination.Trace.route
+        else -> AppDestination.Home.route
     }
 
     NavHost(
@@ -90,7 +95,22 @@ fun YamoneKoreanNavHost(
                     }
 
                     AppDestination.Trace -> {
+                        val savedTraceLessonId = learningProgress.currentLessonId
+                            .takeIf { learningProgress.currentStageRoute == AppDestination.Trace.route }
+
                         TraceScreen(
+                            initialLessonId = savedTraceLessonId,
+                            completedLessonIds = learningProgress.completedLessonIds,
+                            onLessonOpened = { lessonId ->
+                                scope.launch {
+                                    onLessonOpened(AppDestination.Trace.route, lessonId)
+                                }
+                            },
+                            onLessonCompleted = { lessonId ->
+                                scope.launch {
+                                    onLessonCompleted(lessonId)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }

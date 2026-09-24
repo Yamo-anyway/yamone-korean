@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.yamone.korean.data.LanguagePreferenceState
 import com.yamone.korean.data.LearningProgressRepository
+import com.yamone.korean.data.LearningProgressState
 import com.yamone.korean.data.UserPreferencesRepository
 import com.yamone.korean.navigation.YamoneKoreanNavHost
 import com.yamone.korean.ui.components.BannerAdSlot
@@ -33,6 +34,9 @@ fun YamoneKoreanApp() {
     val languagePreference by preferencesRepository.languagePreference.collectAsState(
         initial = LanguagePreferenceState(),
     )
+    val learningProgress by learningProgressRepository.progress.collectAsState(
+        initial = LearningProgressState(),
+    )
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -46,7 +50,7 @@ fun YamoneKoreanApp() {
                         .fillMaxSize()
                         .padding(innerPadding),
                 ) {
-                    if (!languagePreference.isLoaded) {
+                    if (!languagePreference.isLoaded || !learningProgress.isLoaded) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center,
@@ -57,11 +61,18 @@ fun YamoneKoreanApp() {
                         YamoneKoreanNavHost(
                             navController = navController,
                             initialLanguageCode = languagePreference.languageCode,
+                            learningProgress = learningProgress,
                             onExplanationLanguageSelected = { languageCode ->
                                 preferencesRepository.setExplanationLanguage(languageCode)
                             },
                             onStageOpened = { stageRoute ->
                                 learningProgressRepository.setCurrentPosition(stageRoute)
+                            },
+                            onLessonOpened = { stageRoute, lessonId ->
+                                learningProgressRepository.setCurrentPosition(stageRoute, lessonId)
+                            },
+                            onLessonCompleted = { lessonId ->
+                                learningProgressRepository.markLessonCompleted(lessonId)
                             },
                         )
                     }

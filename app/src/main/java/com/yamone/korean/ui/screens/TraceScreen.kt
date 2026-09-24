@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,17 +33,44 @@ import com.yamone.korean.learning.NormalizedPoint
 import com.yamone.korean.learning.TraceEvaluator
 
 @Composable
-fun TraceScreen(onContinue: () -> Unit) {
+fun TraceScreen(
+    initialLessonId: String?,
+    completedLessonIds: Set<String>,
+    onLessonOpened: (String) -> Unit,
+    onLessonCompleted: (String) -> Unit,
+    onContinue: () -> Unit,
+) {
     val lessons = remember { BasicTraceCatalog.orderedLessons }
-    var lessonIndex by remember { mutableStateOf(0) }
+    val initialIndex = remember(initialLessonId) {
+        val savedIndex = lessons.indexOfFirst { it.id == initialLessonId }
+        if (savedIndex >= 0) {
+            savedIndex
+        } else {
+            lessons.indexOfFirst { it.id !in completedLessonIds }.takeIf { it >= 0 } ?: 0
+        }
+    }
+    var lessonIndex by remember(initialLessonId) { mutableStateOf(initialIndex) }
     val lesson = lessons[lessonIndex]
     val completedStrokes = remember(lesson.id) { mutableStateListOf<List<Offset>>() }
     var activeStroke by remember(lesson.id) { mutableStateOf<List<Offset>>(emptyList()) }
-    var passed by remember(lesson.id) { mutableStateOf(false) }
-    var feedback by remember(lesson.id) { mutableStateOf<String?>(null) }
+    var passed by remember(lesson.id) { mutableStateOf(lesson.id in completedLessonIds) }
+    var feedback by remember(lesson.id) {
+        mutableStateOf(
+            if (lesson.id in completedLessonIds) {
+                "Saved as completed. You can continue or practice again."
+            } else {
+                null
+            },
+        )
+    }
     val guideColor = MaterialTheme.colorScheme.outlineVariant
     val writingColor = MaterialTheme.colorScheme.primary
     val isLastLesson = lessonIndex == lessons.lastIndex
+    val completedTraceCount = lessons.count { it.id in completedLessonIds }
+
+    LaunchedEffect(lesson.id) {
+        onLessonOpened(lesson.id)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 16.dp),
@@ -50,7 +78,8 @@ fun TraceScreen(onContinue: () -> Unit) {
     ) {
         Text("Touch writing · " + lesson.symbol, style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Letter " + (lessonIndex + 1) + " of " + lessons.size,
+            "Letter " + (lessonIndex + 1) + " of " + lessons.size +
+                " · Saved " + completedTraceCount + "/" + lessons.size,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -90,7 +119,8 @@ fun TraceScreen(onContinue: () -> Unit) {
                             val result = TraceEvaluator.assess(normalized, lesson)
                             passed = result.passed
                             feedback = if (result.passed) {
-                                "Great! " + lesson.symbol + " was traced correctly."
+                                onLessonCompleted(lesson.id)
+                                "Great! " + lesson.symbol + " was traced correctly and saved."
                             } else {
                                 traceFeedback(result.reason, result.strokeIndex)
                             }
