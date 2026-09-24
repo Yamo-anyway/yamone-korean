@@ -1,6 +1,7 @@
 package com.yamone.korean.data
 
 import android.content.Context
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -32,10 +33,8 @@ class UserPreferencesRepository(
             "Unsupported explanation language: $languageCode"
         }
 
-        context.userPreferencesDataStore.updateData { preferences ->
-            preferences.toMutablePreferences().apply {
-                this[EXPLANATION_LANGUAGE_KEY] = languageCode
-            }
+        context.userPreferencesDataStore.edit { preferences ->
+            preferences[EXPLANATION_LANGUAGE_KEY] = languageCode
         }
     }
 
