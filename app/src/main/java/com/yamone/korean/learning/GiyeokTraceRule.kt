@@ -1,5 +1,7 @@
 package com.yamone.korean.learning
 
+import kotlin.math.abs
+
 data class NormalizedPoint(val x: Float, val y: Float)
 
 data class GiyeokTraceAssessment(
@@ -35,9 +37,18 @@ object GiyeokTraceRule {
         if (end.y - corner.y < 0.28f) {
             return GiyeokTraceAssessment(false, "move_down_second")
         }
-        if (kotlin.math.abs(end.x - corner.x) > 0.18f) {
+        if (abs(end.x - corner.x) > 0.18f) {
             return GiyeokTraceAssessment(false, "vertical_alignment")
         }
+
+        val horizontal = points.subList(0, cornerIndex + 1)
+        val vertical = points.subList(cornerIndex, points.size)
+        val horizontalOffGuide = horizontal.count { abs(it.y - 0.28f) > 0.14f }
+        val verticalOffGuide = vertical.count { abs(it.x - 0.72f) > 0.14f }
+        if (horizontalOffGuide > horizontal.size / 3 || verticalOffGuide > vertical.size / 3) {
+            return GiyeokTraceAssessment(false, "guide_deviation")
+        }
+
         if (end.x !in 0.54f..0.90f || end.y !in 0.56f..0.92f) {
             return GiyeokTraceAssessment(false, "end_position")
         }

@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.yamone.korean.learning.GiyeokTraceRule
+import com.yamone.korean.learning.NormalizedPoint
 
 @Composable
 fun TraceScreen(
@@ -34,6 +36,8 @@ fun TraceScreen(
 ) {
     val completedStrokes = remember { mutableStateListOf<List<Offset>>() }
     var activeStroke by remember { mutableStateOf<List<Offset>>(emptyList()) }
+    var passed by remember { mutableStateOf(false) }
+    var feedback by remember { mutableStateOf<String?>(null) }
     val guideColor = MaterialTheme.colorScheme.outlineVariant
     val writingColor = MaterialTheme.colorScheme.primary
 
@@ -52,6 +56,14 @@ fun TraceScreen(
             style = MaterialTheme.typography.bodyLarge,
         )
 
+        feedback?.let {
+            Text(
+                text = it,
+                color = if (passed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,10 +71,32 @@ fun TraceScreen(
                 .aspectRatio(1f)
                 .pointerInput(Unit) {
                     detectDragGestures(
-                        onDragStart = { activeStroke = listOf(it) },
+                        onDragStart = {
+                            activeStroke = listOf(it)
+                            passed = false
+                            feedback = null
+                        },
                         onDragEnd = {
                             if (activeStroke.size > 1) {
                                 completedStrokes.add(activeStroke)
+                                if (completedStrokes.size > 1) {
+                                    passed = false
+                                    feedback = "Use one continuous stroke for ㄱ."
+                                } else {
+                                    val points = activeStroke.map { point ->
+                                        NormalizedPoint(
+                                            x = point.x / size.width.toFloat(),
+                                            y = point.y / size.height.toFloat(),
+                                        )
+                                    }
+                                    val result = GiyeokTraceRule.assess(points)
+                                    passed = result.passed
+                                    feedback = if (result.passed) {
+                                        "Great! ㄱ was traced correctly."
+                                    } else {
+                                        traceFeedback(result.reason)
+                                    }
+                                }
                             }
                             activeStroke = emptyList()
                         },
@@ -124,6 +158,8 @@ fun TraceScreen(
                 onClick = {
                     completedStrokes.clear()
                     activeStroke = emptyList()
+                    passed = false
+                    feedback = null
                 },
             ) {
                 Text("Clear")
@@ -131,10 +167,23 @@ fun TraceScreen(
 
             Button(
                 modifier = Modifier.weight(1f),
+                enabled = passed,
                 onClick = onContinue,
             ) {
                 Text("Continue")
             }
         }
     }
+}
+
+private fun traceFeedback(reason: String): String = when (reason) {
+    "too_short" -> "Draw the whole ㄱ in one continuous stroke."
+    "start_position" -> "Start closer to the dot."
+    "corner_position" -> "Turn downward near the top-right corner."
+    "move_right_first" -> "First move to the right."
+    "move_down_second" -> "After the corner, move down."
+    "vertical_alignment" -> "Keep the second part more vertical."
+    "guide_deviation" -> "Stay closer to the guide line."
+    "end_position" -> "Finish near the bottom of the guide."
+    else -> "Try tracing ㄱ again."
 }
