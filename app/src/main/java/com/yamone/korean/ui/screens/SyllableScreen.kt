@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +29,8 @@ private data class SyllableScreenText(
     val intro: String,
     val rightRule: String,
     val belowRule: String,
+    val chooseInitial: String,
+    val chooseVowel: String,
     val sound: String,
     val continueLabel: String,
 )
@@ -38,16 +41,19 @@ fun SyllableScreen(
     onContinue: () -> Unit,
 ) {
     val text = syllableScreenText(languageCode)
-    var selectedLessonId by rememberSaveable { mutableStateOf(BasicSyllableCatalog.lessons.first().id) }
-    val selectedLesson = BasicSyllableCatalog.byId(selectedLessonId) ?: BasicSyllableCatalog.lessons.first()
-    val initialLessonIds = listOf("syllable_ga", "syllable_na", "syllable_mi", "syllable_bu")
-    var selectedInitialLessonId by rememberSaveable { mutableStateOf(initialLessonIds.first()) }
-    val vowelLessonIds = when (selectedInitialLessonId) {
-        "syllable_ga" -> listOf("syllable_ga", "syllable_go")
-        "syllable_na" -> listOf("syllable_na", "syllable_nu")
-        "syllable_mi" -> listOf("syllable_mi")
-        else -> listOf("syllable_bu")
+    val initialLessons = BasicSyllableCatalog.lessons.distinctBy { it.initialJamoId }
+    var selectedInitialJamoId by rememberSaveable {
+        mutableStateOf(initialLessons.first().initialJamoId)
     }
+    var selectedLessonId by rememberSaveable {
+        mutableStateOf(BasicSyllableCatalog.lessons.first().id)
+    }
+    val availableVowelLessons = BasicSyllableCatalog.lessons.filter {
+        it.initialJamoId == selectedInitialJamoId
+    }
+    val selectedLesson = BasicSyllableCatalog.byId(selectedLessonId)
+        ?.takeIf { it.initialJamoId == selectedInitialJamoId }
+        ?: availableVowelLessons.first()
 
     LazyColumn(
         modifier = Modifier
@@ -71,11 +77,65 @@ fun SyllableScreen(
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
-                        text = selectedLesson.initial + " + " + selectedLesson.vowel + " -> " + selectedLesson.syllable,
+                        text = text.chooseInitial,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        initialLessons.forEach { lesson ->
+                            val onSelect = {
+                                selectedInitialJamoId = lesson.initialJamoId
+                                val firstMatch = BasicSyllableCatalog.lessons.first {
+                                    it.initialJamoId == lesson.initialJamoId
+                                }
+                                selectedLessonId = firstMatch.id
+                            }
+                            if (selectedInitialJamoId == lesson.initialJamoId) {
+                                Button(onClick = onSelect) {
+                                    Text(lesson.initial)
+                                }
+                            } else {
+                                OutlinedButton(onClick = onSelect) {
+                                    Text(lesson.initial)
+                                }
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = text.chooseVowel,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        availableVowelLessons.forEach { lesson ->
+                            val onSelect = { selectedLessonId = lesson.id }
+                            if (selectedLessonId == lesson.id) {
+                                Button(onClick = onSelect) {
+                                    Text(lesson.vowel)
+                                }
+                            } else {
+                                OutlinedButton(onClick = onSelect) {
+                                    Text(lesson.vowel)
+                                }
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = selectedLesson.initial + " + " + selectedLesson.vowel + " → " + selectedLesson.syllable,
                         style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Text(
+                        text = text.sound + ": " + selectedLesson.soundGuide,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
@@ -150,6 +210,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "Una sílaba coreana agrupa una consonante inicial y una vocal en un solo bloque. Primero practica bloques simples sin consonante final.",
         rightRule = "Con ㅏ, ㅓ, ㅑ, ㅕ o ㅣ, la vocal se coloca a la derecha de la consonante.",
         belowRule = "Con ㅗ, ㅜ, ㅛ, ㅠ o ㅡ, la vocal se coloca debajo de la consonante.",
+        chooseInitial = "1. Elige una consonante inicial",
+        chooseVowel = "2. Elige una vocal",
         sound = "Sonido",
         continueLabel = "Continuar con palabras",
     )
@@ -158,6 +220,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "Une syllabe coréenne regroupe une consonne initiale et une voyelle dans un seul bloc. Commence par des blocs simples sans consonne finale.",
         rightRule = "Avec ㅏ, ㅓ, ㅑ, ㅕ ou ㅣ, la voyelle se place à droite de la consonne.",
         belowRule = "Avec ㅗ, ㅜ, ㅛ, ㅠ ou ㅡ, la voyelle se place sous la consonne.",
+        chooseInitial = "1. Choisis une consonne initiale",
+        chooseVowel = "2. Choisis une voyelle",
         sound = "Son",
         continueLabel = "Continuer vers les mots",
     )
@@ -166,6 +230,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "Một âm tiết tiếng Hàn ghép phụ âm đầu và nguyên âm thành một khối. Trước tiên hãy luyện các khối đơn giản chưa có phụ âm cuối.",
         rightRule = "Với ㅏ, ㅓ, ㅑ, ㅕ hoặc ㅣ, nguyên âm nằm bên phải phụ âm.",
         belowRule = "Với ㅗ, ㅜ, ㅛ, ㅠ hoặc ㅡ, nguyên âm nằm bên dưới phụ âm.",
+        chooseInitial = "1. Chọn phụ âm đầu",
+        chooseVowel = "2. Chọn nguyên âm",
         sound = "Âm",
         continueLabel = "Tiếp tục với từ",
     )
@@ -174,6 +240,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "พยางค์เกาหลีรวมพยัญชนะต้นและสระไว้ในบล็อกเดียว เริ่มจากบล็อกง่าย ๆ ที่ยังไม่มีตัวสะกด",
         rightRule = "เมื่อใช้ ㅏ, ㅓ, ㅑ, ㅕ หรือ ㅣ สระจะอยู่ทางขวาของพยัญชนะ",
         belowRule = "เมื่อใช้ ㅗ, ㅜ, ㅛ, ㅠ หรือ ㅡ สระจะอยู่ใต้พยัญชนะ",
+        chooseInitial = "1. เลือกพยัญชนะต้น",
+        chooseVowel = "2. เลือกสระ",
         sound = "เสียง",
         continueLabel = "เรียนคำต่อ",
     )
@@ -182,6 +250,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "Satu suku kata Korea menggabungkan konsonan awal dan vokal menjadi satu blok. Mulailah dengan blok sederhana tanpa konsonan akhir.",
         rightRule = "Dengan ㅏ, ㅓ, ㅑ, ㅕ, atau ㅣ, vokal ditempatkan di sebelah kanan konsonan.",
         belowRule = "Dengan ㅗ, ㅜ, ㅛ, ㅠ, atau ㅡ, vokal ditempatkan di bawah konsonan.",
+        chooseInitial = "1. Pilih konsonan awal",
+        chooseVowel = "2. Pilih vokal",
         sound = "Bunyi",
         continueLabel = "Lanjut ke kata",
     )
@@ -190,6 +260,8 @@ private fun syllableScreenText(languageCode: String?): SyllableScreenText = when
         intro = "A Korean syllable combines an initial consonant and a vowel into one block. Start with simple blocks that do not have a final consonant.",
         rightRule = "With ㅏ, ㅓ, ㅑ, ㅕ or ㅣ, place the vowel to the right of the consonant.",
         belowRule = "With ㅗ, ㅜ, ㅛ, ㅠ or ㅡ, place the vowel below the consonant.",
+        chooseInitial = "1. Choose an initial consonant",
+        chooseVowel = "2. Choose a vowel",
         sound = "Sound",
         continueLabel = "Continue to words",
     )
