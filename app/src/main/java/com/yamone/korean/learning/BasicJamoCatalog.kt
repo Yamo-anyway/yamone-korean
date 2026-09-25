@@ -1,7 +1,7 @@
 package com.yamone.korean.learning
 
-object JamoCatalog {
-    val basicConsonants: List<JamoLesson> = listOf(
+object BasicJamoCatalog {
+    val consonants: List<JamoLesson> = listOf(
         JamoLesson("jamo_giyeok", "ㄱ", JamoType.CONSONANT, "g / k", "가", 1),
         JamoLesson("jamo_nieun", "ㄴ", JamoType.CONSONANT, "n", "나", 2),
         JamoLesson("jamo_digeut", "ㄷ", JamoType.CONSONANT, "d / t", "다", 3),
@@ -18,7 +18,7 @@ object JamoCatalog {
         JamoLesson("jamo_hieut", "ㅎ", JamoType.CONSONANT, "h", "하", 14),
     )
 
-    val basicVowels: List<JamoLesson> = listOf(
+    val vowels: List<JamoLesson> = listOf(
         JamoLesson("jamo_a", "ㅏ", JamoType.VOWEL, "a", "아", 1),
         JamoLesson("jamo_ya", "ㅑ", JamoType.VOWEL, "ya", "야", 2),
         JamoLesson("jamo_eo", "ㅓ", JamoType.VOWEL, "eo", "어", 3),
@@ -31,7 +31,7 @@ object JamoCatalog {
         JamoLesson("jamo_i", "ㅣ", JamoType.VOWEL, "i", "이", 10),
     )
 
-    val allBasic: List<JamoLesson> = basicConsonants + basicVowels
+    val lessons: List<JamoLesson> = consonants + vowels
 
-    fun byId(id: String): JamoLesson? = allBasic.firstOrNull { it.id == id }
+    fun findById(id: String): JamoLesson? = lessons.firstOrNull { it.id == id }
 }
