@@ -167,6 +167,112 @@ object BasicTraceCatalog {
         ),
     )
 
+    val ieung = TraceLessonSpec(
+        id = "jamo_ieung",
+        symbol = "\u3147",
+        instruction = "Start at the top and draw one smooth circle back to the starting point.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.22f),
+                    NormalizedPoint(0.34f, 0.27f),
+                    NormalizedPoint(0.26f, 0.50f),
+                    NormalizedPoint(0.34f, 0.73f),
+                    NormalizedPoint(0.50f, 0.78f),
+                    NormalizedPoint(0.66f, 0.73f),
+                    NormalizedPoint(0.74f, 0.50f),
+                    NormalizedPoint(0.66f, 0.27f),
+                    NormalizedPoint(0.50f, 0.22f),
+                ),
+                checkpoints = listOf(
+                    NormalizedPoint(0.26f, 0.50f),
+                    NormalizedPoint(0.50f, 0.78f),
+                    NormalizedPoint(0.74f, 0.50f),
+                ),
+            ),
+        ),
+    )
+
+    val jieut = TraceLessonSpec(
+        id = "jamo_jieut",
+        symbol = "\u3148",
+        instruction = "Draw the top line, then the left diagonal, then the right diagonal.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.30f, 0.26f),
+                    NormalizedPoint(0.70f, 0.26f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.34f),
+                    NormalizedPoint(0.30f, 0.76f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.34f),
+                    NormalizedPoint(0.70f, 0.76f),
+                ),
+            ),
+        ),
+    )
+
+    val chieut = TraceLessonSpec(
+        id = "jamo_chieut",
+        symbol = "\u314A",
+        instruction = "Draw the short top line, the second horizontal line, then the two diagonals.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.40f, 0.18f),
+                    NormalizedPoint(0.60f, 0.18f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.30f, 0.34f),
+                    NormalizedPoint(0.70f, 0.34f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.40f),
+                    NormalizedPoint(0.30f, 0.78f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.40f),
+                    NormalizedPoint(0.70f, 0.78f),
+                ),
+            ),
+        ),
+    )
+
+    val kieuk = TraceLessonSpec(
+        id = "jamo_kieuk",
+        symbol = "\u314B",
+        instruction = "Draw the giyeok shape first, then add the middle horizontal line.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.28f, 0.24f),
+                    NormalizedPoint(0.72f, 0.24f),
+                    NormalizedPoint(0.72f, 0.76f),
+                ),
+                checkpoints = listOf(NormalizedPoint(0.72f, 0.24f)),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.30f, 0.50f),
+                    NormalizedPoint(0.70f, 0.50f),
+                ),
+            ),
+        ),
+    )
+
     val a = TraceLessonSpec(
         id = "jamo_a",
         symbol = "\u314F",
@@ -195,6 +301,10 @@ object BasicTraceCatalog {
         mieum,
         bieup,
         siot,
+        ieung,
+        jieut,
+        chieut,
+        kieuk,
         a,
     )
 
