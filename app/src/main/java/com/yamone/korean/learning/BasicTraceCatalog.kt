@@ -196,19 +196,15 @@ object BasicTraceCatalog {
     val jieut = TraceLessonSpec(
         id = "jamo_jieut",
         symbol = "\u3148",
-        instruction = "Draw the top line, then the left diagonal, then the right diagonal.",
+        instruction = "Draw the top line and continue diagonally down-left, then draw the right diagonal.",
         strokes = listOf(
             TraceStrokeSpec(
                 guidePath = listOf(
                     NormalizedPoint(0.30f, 0.26f),
                     NormalizedPoint(0.70f, 0.26f),
-                ),
-            ),
-            TraceStrokeSpec(
-                guidePath = listOf(
-                    NormalizedPoint(0.50f, 0.34f),
                     NormalizedPoint(0.30f, 0.76f),
                 ),
+                checkpoints = listOf(NormalizedPoint(0.70f, 0.26f)),
             ),
             TraceStrokeSpec(
                 guidePath = listOf(
@@ -222,7 +218,7 @@ object BasicTraceCatalog {
     val chieut = TraceLessonSpec(
         id = "jamo_chieut",
         symbol = "\u314A",
-        instruction = "Draw the short top line, the second horizontal line, then the two diagonals.",
+        instruction = "Draw the short top line, draw the second line and continue diagonally down-left, then draw the right diagonal.",
         strokes = listOf(
             TraceStrokeSpec(
                 guidePath = listOf(
@@ -234,13 +230,9 @@ object BasicTraceCatalog {
                 guidePath = listOf(
                     NormalizedPoint(0.30f, 0.34f),
                     NormalizedPoint(0.70f, 0.34f),
-                ),
-            ),
-            TraceStrokeSpec(
-                guidePath = listOf(
-                    NormalizedPoint(0.50f, 0.40f),
                     NormalizedPoint(0.30f, 0.78f),
                 ),
+                checkpoints = listOf(NormalizedPoint(0.70f, 0.34f)),
             ),
             TraceStrokeSpec(
                 guidePath = listOf(
