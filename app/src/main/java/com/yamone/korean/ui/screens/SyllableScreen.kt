@@ -67,6 +67,20 @@ fun SyllableScreen(
             )
         }
 
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        text = selectedLesson.initial + " + " + selectedLesson.vowel + " -> " + selectedLesson.syllable,
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                }
+            }
+        }
+
         items(
             items = BasicSyllableCatalog.lessons,
             key = { it.id },
