@@ -141,6 +141,10 @@ fun SyllableScreen(
             }
         }
 
+        item {
+            SyllableQuizCard(languageCode = languageCode)
+        }
+
         items(
             items = BasicSyllableCatalog.lessons,
             key = { it.id },
