@@ -273,6 +273,65 @@ object BasicTraceCatalog {
         ),
     )
 
+
+    val tieut = TraceLessonSpec(
+        id = "jamo_tieut",
+        symbol = "ㅌ",
+        instruction = "Draw the top horizontal line, then the middle horizontal line, and finish with the nieun-shaped stroke.",
+        strokes = listOf(
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.28f, 0.22f), NormalizedPoint(0.72f, 0.22f))),
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.30f, 0.46f), NormalizedPoint(0.70f, 0.46f))),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.28f, 0.22f),
+                    NormalizedPoint(0.28f, 0.78f),
+                    NormalizedPoint(0.72f, 0.78f),
+                ),
+                checkpoints = listOf(NormalizedPoint(0.28f, 0.78f)),
+            ),
+        ),
+    )
+
+    val pieup = TraceLessonSpec(
+        id = "jamo_pieup",
+        symbol = "ㅍ",
+        instruction = "Draw the top line, the left vertical, the right vertical, and then the bottom line.",
+        strokes = listOf(
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.28f, 0.24f), NormalizedPoint(0.72f, 0.24f))),
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.28f, 0.24f), NormalizedPoint(0.28f, 0.76f))),
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.72f, 0.24f), NormalizedPoint(0.72f, 0.76f))),
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.28f, 0.76f), NormalizedPoint(0.72f, 0.76f))),
+        ),
+    )
+
+    val hieuh = TraceLessonSpec(
+        id = "jamo_hieuh",
+        symbol = "ㅎ",
+        instruction = "Draw the short top mark, then the horizontal line, and finish with the circle.",
+        strokes = listOf(
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.50f, 0.14f), NormalizedPoint(0.50f, 0.28f))),
+            TraceStrokeSpec(guidePath = listOf(NormalizedPoint(0.34f, 0.34f), NormalizedPoint(0.66f, 0.34f))),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.50f, 0.46f),
+                    NormalizedPoint(0.36f, 0.50f),
+                    NormalizedPoint(0.30f, 0.64f),
+                    NormalizedPoint(0.36f, 0.78f),
+                    NormalizedPoint(0.50f, 0.82f),
+                    NormalizedPoint(0.64f, 0.78f),
+                    NormalizedPoint(0.70f, 0.64f),
+                    NormalizedPoint(0.64f, 0.50f),
+                    NormalizedPoint(0.50f, 0.46f),
+                ),
+                checkpoints = listOf(
+                    NormalizedPoint(0.30f, 0.64f),
+                    NormalizedPoint(0.50f, 0.82f),
+                    NormalizedPoint(0.70f, 0.64f),
+                ),
+            ),
+        ),
+    )
+
     val a = TraceLessonSpec(
         id = "jamo_a",
         symbol = "\u314F",
@@ -305,6 +364,9 @@ object BasicTraceCatalog {
         jieut,
         chieut,
         kieuk,
+        tieut,
+        pieup,
+        hieuh,
         a,
     )
 
