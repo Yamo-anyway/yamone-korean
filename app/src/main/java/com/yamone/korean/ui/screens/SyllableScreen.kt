@@ -38,6 +38,7 @@ fun SyllableScreen(
     onContinue: () -> Unit,
 ) {
     val text = syllableScreenText(languageCode)
+    var selectedLessonId by rememberSaveable { mutableStateOf(BasicSyllableCatalog.lessons.first().id) }
 
     LazyColumn(
         modifier = Modifier
