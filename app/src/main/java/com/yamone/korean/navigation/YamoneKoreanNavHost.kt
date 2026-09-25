@@ -15,6 +15,7 @@ import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
+import com.yamone.korean.ui.screens.SyllableScreen
 import com.yamone.korean.ui.screens.TraceScreen
 import kotlinx.coroutines.launch
 
@@ -127,6 +128,13 @@ fun YamoneKoreanNavHost(
                                     onLessonCompleted(lessonId)
                                 }
                             },
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Syllable -> {
+                        SyllableScreen(
+                            languageCode = initialLanguageCode,
                             onContinue = onNext ?: {},
                         )
                     }
