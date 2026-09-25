@@ -90,6 +90,12 @@ fun YamoneKoreanNavHost(
                     AppDestination.Jamo -> {
                         JamoScreen(
                             languageCode = initialLanguageCode,
+                            onPractice = { lessonId ->
+                                scope.launch {
+                                    onLessonOpened(AppDestination.Trace.route, lessonId)
+                                    navController.navigate(AppDestination.Trace.route)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }

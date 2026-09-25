@@ -1,5 +1,6 @@
 package com.yamone.korean.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ private data class JamoScreenText(
 @Composable
 fun JamoScreen(
     languageCode: String?,
+    onPractice: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val text = jamoScreenText(languageCode)
@@ -69,6 +71,7 @@ fun JamoScreen(
                 lesson = lesson,
                 soundLabel = text.sound,
                 exampleLabel = text.example,
+                onPractice = onPractice,
             )
         }
 
@@ -88,6 +91,7 @@ fun JamoScreen(
                 lesson = lesson,
                 soundLabel = text.sound,
                 exampleLabel = text.example,
+                onPractice = onPractice,
             )
         }
 
@@ -109,8 +113,13 @@ private fun JamoLessonCard(
     lesson: JamoLesson,
     soundLabel: String,
     exampleLabel: String,
+    onPractice: (String) -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onPractice(lesson.id) },
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -122,6 +131,7 @@ private fun JamoLessonCard(
                 style = MaterialTheme.typography.displaySmall,
             )
             Column(
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
@@ -133,6 +143,7 @@ private fun JamoLessonCard(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
+            Text("›", style = MaterialTheme.typography.titleLarge)
         }
     }
 }
