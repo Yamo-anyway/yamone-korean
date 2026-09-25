@@ -28,3 +28,5 @@ object BasicSyllableCatalog {
 
     fun byId(id: String): BasicSyllableLesson? = lessons.firstOrNull { it.id == id }
 }
+
+// Open-syllable composition is implemented by the interactive builder.
