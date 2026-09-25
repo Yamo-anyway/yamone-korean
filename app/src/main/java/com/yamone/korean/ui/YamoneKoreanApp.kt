@@ -74,6 +74,12 @@ fun YamoneKoreanApp() {
                             onLessonCompleted = { lessonId ->
                                 learningProgressRepository.markLessonCompleted(lessonId)
                             },
+                            onSyllableQuizAnswered = { lessonId, isCorrect ->
+                                learningProgressRepository.recordSyllableQuizAnswer(
+                                    lessonId = lessonId,
+                                    isCorrect = isCorrect,
+                                )
+                            },
                         )
                     }
                 }

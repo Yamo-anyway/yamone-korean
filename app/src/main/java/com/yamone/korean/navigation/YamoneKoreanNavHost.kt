@@ -28,6 +28,7 @@ fun YamoneKoreanNavHost(
     onStageOpened: suspend (String) -> Unit,
     onLessonOpened: suspend (String, String) -> Unit,
     onLessonCompleted: suspend (String) -> Unit,
+    onSyllableQuizAnswered: suspend (lessonId: String, isCorrect: Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var requestedTraceLessonId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -135,6 +136,11 @@ fun YamoneKoreanNavHost(
                     AppDestination.Syllable -> {
                         SyllableScreen(
                             languageCode = initialLanguageCode,
+                            onQuizAnswered = { lessonId, isCorrect ->
+                                scope.launch {
+                                    onSyllableQuizAnswered(lessonId, isCorrect)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }

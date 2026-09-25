@@ -38,6 +38,7 @@ private data class SyllableScreenText(
 @Composable
 fun SyllableScreen(
     languageCode: String?,
+    onQuizAnswered: (lessonId: String, isCorrect: Boolean) -> Unit,
     onContinue: () -> Unit,
 ) {
     val text = syllableScreenText(languageCode)
@@ -142,7 +143,10 @@ fun SyllableScreen(
         }
 
         item {
-            SyllableQuizCard(languageCode = languageCode)
+            SyllableQuizCard(
+                languageCode = languageCode,
+                onAnswerChecked = onQuizAnswered,
+            )
         }
 
         items(

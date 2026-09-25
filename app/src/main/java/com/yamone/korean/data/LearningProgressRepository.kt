@@ -2,6 +2,7 @@ package com.yamone.korean.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -16,6 +17,9 @@ data class LearningProgressState(
     val currentLessonId: String? = null,
     val completedLessonIds: Set<String> = emptySet(),
     val reviewLessonIds: Set<String> = emptySet(),
+    val syllableQuizAnsweredCount: Int = 0,
+    val syllableQuizCorrectCount: Int = 0,
+    val syllableQuizIncorrectCount: Int = 0,
 )
 
 class LearningProgressRepository(private val context: Context) {
@@ -27,6 +31,9 @@ class LearningProgressRepository(private val context: Context) {
                 currentLessonId = preferences[CURRENT_LESSON_ID_KEY],
                 completedLessonIds = preferences[COMPLETED_LESSON_IDS_KEY].orEmpty(),
                 reviewLessonIds = preferences[REVIEW_LESSON_IDS_KEY].orEmpty(),
+                syllableQuizAnsweredCount = preferences[SYLLABLE_QUIZ_ANSWERED_COUNT_KEY] ?: 0,
+                syllableQuizCorrectCount = preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] ?: 0,
+                syllableQuizIncorrectCount = preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] ?: 0,
             )
         }
 
@@ -61,10 +68,30 @@ class LearningProgressRepository(private val context: Context) {
         }
     }
 
+    suspend fun recordSyllableQuizAnswer(lessonId: String, isCorrect: Boolean) {
+        context.learningProgressDataStore.edit { preferences ->
+            preferences[SYLLABLE_QUIZ_ANSWERED_COUNT_KEY] =
+                (preferences[SYLLABLE_QUIZ_ANSWERED_COUNT_KEY] ?: 0) + 1
+
+            if (isCorrect) {
+                preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] =
+                    (preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] ?: 0) + 1
+            } else {
+                preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] =
+                    (preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] ?: 0) + 1
+                preferences[REVIEW_LESSON_IDS_KEY] =
+                    preferences[REVIEW_LESSON_IDS_KEY].orEmpty() + lessonId
+            }
+        }
+    }
+
     companion object {
         private val CURRENT_STAGE_ROUTE_KEY = stringPreferencesKey("current_stage_route")
         private val CURRENT_LESSON_ID_KEY = stringPreferencesKey("current_lesson_id")
         private val COMPLETED_LESSON_IDS_KEY = stringSetPreferencesKey("completed_lesson_ids")
         private val REVIEW_LESSON_IDS_KEY = stringSetPreferencesKey("review_lesson_ids")
+        private val SYLLABLE_QUIZ_ANSWERED_COUNT_KEY = intPreferencesKey("syllable_quiz_answered_count")
+        private val SYLLABLE_QUIZ_CORRECT_COUNT_KEY = intPreferencesKey("syllable_quiz_correct_count")
+        private val SYLLABLE_QUIZ_INCORRECT_COUNT_KEY = intPreferencesKey("syllable_quiz_incorrect_count")
     }
 }

@@ -33,6 +33,7 @@ private data class SyllableQuizText(
 @Composable
 internal fun SyllableQuizCard(
     languageCode: String?,
+    onAnswerChecked: (lessonId: String, isCorrect: Boolean) -> Unit,
 ) {
     val lessons = BasicSyllableCatalog.lessons
     val initialOptions = lessons.distinctBy { it.initialJamoId }
@@ -121,7 +122,10 @@ internal fun SyllableQuizCard(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = selectedInitialId != null && selectedVowelId != null,
-                    onClick = { checked = true },
+                    onClick = {
+                        checked = true
+                        onAnswerChecked(lesson.id, correct)
+                    },
                 ) {
                     Text(text.check)
                 }
