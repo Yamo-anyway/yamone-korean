@@ -1,7 +1,11 @@
 package com.yamone.korean.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +29,7 @@ fun YamoneKoreanNavHost(
     onLessonCompleted: suspend (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    var requestedTraceLessonId by rememberSaveable { mutableStateOf<String?>(null) }
     val startDestination = when {
         initialLanguageCode == null -> AppDestination.Language.route
         learningProgress.currentStageRoute == AppDestination.Trace.route &&
@@ -64,6 +69,9 @@ fun YamoneKoreanNavHost(
             HomeScreen(
                 onOpenDestination = { destination ->
                     scope.launch {
+                        if (destination == AppDestination.Trace) {
+                            requestedTraceLessonId = null
+                        }
                         onStageOpened(destination.route)
                         navController.navigate(destination.route)
                     }
@@ -91,6 +99,7 @@ fun YamoneKoreanNavHost(
                         JamoScreen(
                             languageCode = initialLanguageCode,
                             onPractice = { lessonId ->
+                                requestedTraceLessonId = lessonId
                                 scope.launch {
                                     onLessonOpened(AppDestination.Trace.route, lessonId)
                                     navController.navigate(AppDestination.Trace.route)
@@ -103,9 +112,10 @@ fun YamoneKoreanNavHost(
                     AppDestination.Trace -> {
                         val savedTraceLessonId = learningProgress.currentLessonId
                             .takeIf { learningProgress.currentStageRoute == AppDestination.Trace.route }
+                        val initialTraceLessonId = requestedTraceLessonId ?: savedTraceLessonId
 
                         TraceScreen(
-                            initialLessonId = savedTraceLessonId,
+                            initialLessonId = initialTraceLessonId,
                             completedLessonIds = learningProgress.completedLessonIds,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
