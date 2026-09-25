@@ -41,6 +41,7 @@ fun SyllableScreen(
     var selectedLessonId by rememberSaveable { mutableStateOf(BasicSyllableCatalog.lessons.first().id) }
     val selectedLesson = BasicSyllableCatalog.byId(selectedLessonId) ?: BasicSyllableCatalog.lessons.first()
     val initialLessonIds = listOf("syllable_ga", "syllable_na", "syllable_mi", "syllable_bu")
+    var selectedInitialLessonId by rememberSaveable { mutableStateOf(initialLessonIds.first()) }
 
     LazyColumn(
         modifier = Modifier
