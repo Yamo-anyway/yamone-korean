@@ -265,7 +265,6 @@ object BasicTraceCatalog {
         ),
     )
 
-
     val tieut = TraceLessonSpec(
         id = "jamo_tieut",
         symbol = "ㅌ",
@@ -344,6 +343,78 @@ object BasicTraceCatalog {
         ),
     )
 
+    val ya = TraceLessonSpec(
+        id = "jamo_ya",
+        symbol = "ㅑ",
+        instruction = "Draw the long vertical line down, then add the upper and lower short lines to the right.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.46f, 0.16f),
+                    NormalizedPoint(0.46f, 0.84f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.46f, 0.38f),
+                    NormalizedPoint(0.76f, 0.38f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.46f, 0.62f),
+                    NormalizedPoint(0.76f, 0.62f),
+                ),
+            ),
+        ),
+    )
+
+    val eo = TraceLessonSpec(
+        id = "jamo_eo",
+        symbol = "ㅓ",
+        instruction = "Draw the short horizontal line from left to right, then draw the long vertical line down.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.24f, 0.48f),
+                    NormalizedPoint(0.52f, 0.48f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.52f, 0.18f),
+                    NormalizedPoint(0.52f, 0.82f),
+                ),
+            ),
+        ),
+    )
+
+    val yeo = TraceLessonSpec(
+        id = "jamo_yeo",
+        symbol = "ㅕ",
+        instruction = "Draw the upper and lower short lines from left to right, then draw the long vertical line down.",
+        strokes = listOf(
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.22f, 0.38f),
+                    NormalizedPoint(0.52f, 0.38f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.22f, 0.62f),
+                    NormalizedPoint(0.52f, 0.62f),
+                ),
+            ),
+            TraceStrokeSpec(
+                guidePath = listOf(
+                    NormalizedPoint(0.52f, 0.16f),
+                    NormalizedPoint(0.52f, 0.84f),
+                ),
+            ),
+        ),
+    )
+
     val orderedLessons = listOf(
         giyeok,
         nieun,
@@ -360,6 +431,9 @@ object BasicTraceCatalog {
         pieup,
         hieuh,
         a,
+        ya,
+        eo,
+        yeo,
     )
 
     fun byId(id: String): TraceLessonSpec? = orderedLessons.firstOrNull { it.id == id }
