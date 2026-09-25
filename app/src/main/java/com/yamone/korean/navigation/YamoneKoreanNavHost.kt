@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.yamone.korean.ui.screens.HomeScreen
+import com.yamone.korean.ui.screens.JamoLearningScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
@@ -33,10 +34,8 @@ fun YamoneKoreanNavHost(
             LanguageSelectionScreen(
                 onLanguageSelected = { languageCode ->
                     val isFirstLanguageSelection = initialLanguageCode == null
-
                     scope.launch {
                         onExplanationLanguageSelected(languageCode)
-
                         if (isFirstLanguageSelection) {
                             navController.navigate(AppDestination.Home.route) {
                                 popUpTo(AppDestination.Language.route) { inclusive = true }
@@ -67,20 +66,33 @@ fun YamoneKoreanNavHost(
             )
         }
 
+        composable(AppDestination.Jamo.route) {
+            JamoLearningScreen(
+                onStartTrace = {
+                    scope.launch {
+                        onStageOpened(AppDestination.Trace.route)
+                        navController.navigate(AppDestination.Trace.route)
+                    }
+                },
+            )
+        }
+
         learningDestinations.forEachIndexed { index, destination ->
-            composable(destination.route) {
-                val nextDestination = learningDestinations.getOrNull(index + 1)
-                LearningStageScreen(
-                    destination = destination,
-                    onNext = nextDestination?.let { next ->
-                        {
-                            scope.launch {
-                                onStageOpened(next.route)
-                                navController.navigate(next.route)
+            if (destination != AppDestination.Jamo) {
+                composable(destination.route) {
+                    val nextDestination = learningDestinations.getOrNull(index + 1)
+                    LearningStageScreen(
+                        destination = destination,
+                        onNext = nextDestination?.let { next ->
+                            {
+                                scope.launch {
+                                    onStageOpened(next.route)
+                                    navController.navigate(next.route)
+                                }
                             }
-                        }
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
 
