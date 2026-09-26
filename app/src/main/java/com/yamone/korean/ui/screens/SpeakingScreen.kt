@@ -1,11 +1,9 @@
 package com.yamone.korean.ui.screens
 
-import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
-import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,7 +20,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,15 +37,18 @@ private data class SpeakingUiText(
     val intro: String,
     val targetLabel: String,
     val speakLabel: String,
-    val listeningLabel: String,
     val recognizedLabel: String,
     val matchedLabel: String,
     val retryLabel: String,
     val completedLabel: String,
     val unavailableLabel: String,
-    val permissionDeniedLabel: String,
-    val errorLabel: String,
+    val canceledLabel: String,
     val continueLabel: String,
+)
+
+private data class SpeakingAttempt(
+    val recognizedText: String,
+    val similarity: Float,
 )
 
 @Composable
@@ -66,108 +66,76 @@ fun SpeakingScreen(
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
     }
 
-    var recognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
-    var activeLessonId by remember { mutableStateOf<String?>(null) }
-    var isListening by remember { mutableStateOf(false) }
-    var recognitionError by remember { mutableStateOf<String?>(null) }
-    var resultConsumer by remember { mutableStateOf<(List<String>) -> Unit>({}) }
-    var pendingStart by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var activeLesson by remember { mutableStateOf<BasicSentenceLesson?>(null) }
+    var attempts by remember { mutableStateOf<Map<String, SpeakingAttempt>>(emptyMap()) }
+    var statusMessage by remember { mutableStateOf<String?>(null) }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        if (granted) {
-            pendingStart?.invoke()
-        } else {
-            isListening = false
-            activeLessonId = null
-            recognitionError = ui.permissionDeniedLabel
+    val speechLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val lesson = activeLesson
+        if (lesson == null) return@rememberLauncherForActivityResult
+
+        val speakingId = "speaking_${lesson.id}"
+        if (result.resultCode != Activity.RESULT_OK) {
+            statusMessage = ui.canceledLabel
+            activeLesson = null
+            return@rememberLauncherForActivityResult
         }
-        pendingStart = null
-    }
 
-    DisposableEffect(context, onDeviceRecognitionAvailable, languageCode) {
-        if (!onDeviceRecognitionAvailable) {
-            onDispose { }
-        } else {
-            val speechRecognizer =
-                SpeechRecognizer.createOnDeviceSpeechRecognizer(context.applicationContext)
+        val candidates = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            .orEmpty()
 
-            speechRecognizer.setRecognitionListener(
-                object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) = Unit
-                    override fun onBeginningOfSpeech() = Unit
-                    override fun onRmsChanged(rmsdB: Float) = Unit
-                    override fun onBufferReceived(buffer: ByteArray?) = Unit
-                    override fun onEndOfSpeech() = Unit
+        val best = candidates
+            .map { candidate -> candidate to koreanSimilarity(candidate, lesson.korean) }
+            .maxByOrNull { it.second }
 
-                    override fun onError(error: Int) {
-                        isListening = false
-                        recognitionError = ui.errorLabel
-                    }
-
-                    override fun onResults(results: Bundle?) {
-                        isListening = false
-                        recognitionError = null
-                        val candidates = results
-                            ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                            .orEmpty()
-                        resultConsumer(candidates)
-                    }
-
-                    override fun onPartialResults(partialResults: Bundle?) = Unit
-                    override fun onEvent(eventType: Int, params: Bundle?) = Unit
-                },
+        attempts = attempts + (
+            speakingId to SpeakingAttempt(
+                recognizedText = best?.first.orEmpty(),
+                similarity = best?.second ?: 0f,
             )
-            recognizer = speechRecognizer
+        )
 
-            onDispose {
-                speechRecognizer.cancel()
-                speechRecognizer.destroy()
-                recognizer = null
-            }
+        if ((best?.second ?: 0f) >= PASSING_SIMILARITY) {
+            onLessonCompleted(speakingId)
         }
+
+        statusMessage = null
+        activeLesson = null
     }
 
-    fun startSpeakingLesson(
-        speakingId: String,
-        consumeResults: (List<String>) -> Unit,
-    ) {
+    fun startSpeaking(lesson: BasicSentenceLesson) {
+        val speakingId = "speaking_${lesson.id}"
         onLessonOpened(speakingId)
-        recognitionError = null
 
         if (!onDeviceRecognitionAvailable) {
-            recognitionError = ui.unavailableLabel
+            statusMessage = ui.unavailableLabel
             return
         }
 
-        val startRecognition = {
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
-                )
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.KOREA.toLanguageTag())
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "ko-KR")
-                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
-                putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
-            }
-
-            activeLessonId = speakingId
-            resultConsumer = consumeResults
-            isListening = true
-            recognizer?.startListening(intent)
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "ko-KR")
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+            putExtra(RecognizerIntent.EXTRA_PROMPT, lesson.korean)
         }
 
-        if (
-            context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            startRecognition()
-        } else {
-            pendingStart = startRecognition
-            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        activeLesson = lesson
+        statusMessage = null
+
+        try {
+            speechLauncher.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            activeLesson = null
+            statusMessage = ui.unavailableLabel
         }
     }
 
@@ -195,7 +163,7 @@ fun SpeakingScreen(
                 )
             }
 
-            recognitionError?.let { message ->
+            statusMessage?.let { message ->
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = message,
@@ -209,23 +177,14 @@ fun SpeakingScreen(
             key = { it.id },
         ) { lesson ->
             val speakingId = "speaking_${lesson.id}"
-
             SpeakingLessonCard(
                 lesson = lesson,
                 languageCode = languageCode,
                 completed = speakingId in completedLessonIds,
+                attempt = attempts[speakingId],
                 ui = ui,
-                enabled = onDeviceRecognitionAvailable && !isListening,
-                listening = isListening && activeLessonId == speakingId,
-                onSpeak = { consumeResults ->
-                    startSpeakingLesson(
-                        speakingId = speakingId,
-                        consumeResults = consumeResults,
-                    )
-                },
-                onCompleted = {
-                    onLessonCompleted(speakingId)
-                },
+                enabled = onDeviceRecognitionAvailable && activeLesson == null,
+                onSpeak = { startSpeaking(lesson) },
             )
         }
 
@@ -247,15 +206,11 @@ private fun SpeakingLessonCard(
     lesson: BasicSentenceLesson,
     languageCode: String?,
     completed: Boolean,
+    attempt: SpeakingAttempt?,
     ui: SpeakingUiText,
     enabled: Boolean,
-    listening: Boolean,
-    onSpeak: ((List<String>) -> Unit) -> Unit,
-    onCompleted: () -> Unit,
+    onSpeak: () -> Unit,
 ) {
-    var recognizedText by remember(lesson.id) { mutableStateOf<String?>(null) }
-    var similarity by remember(lesson.id) { mutableStateOf<Float?>(null) }
-
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -277,50 +232,29 @@ private fun SpeakingLessonCard(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
-                onClick = {
-                    recognizedText = null
-                    similarity = null
-
-                    onSpeak { candidates ->
-                        val scored = candidates.map { candidate ->
-                            candidate to koreanSimilarity(candidate, lesson.korean)
-                        }
-                        val best = scored.maxByOrNull { it.second }
-                        recognizedText = best?.first
-                        similarity = best?.second ?: 0f
-
-                        if ((best?.second ?: 0f) >= PASSING_SIMILARITY) {
-                            onCompleted()
-                        }
-                    }
-                },
+                onClick = onSpeak,
             ) {
-                Text(if (listening) ui.listeningLabel else ui.speakLabel)
+                Text(ui.speakLabel)
             }
 
-            recognizedText?.let { text ->
+            attempt?.let { result ->
                 Text(
-                    text = "${ui.recognizedLabel}: $text",
+                    text = "${ui.recognizedLabel}: ${result.recognizedText}",
                     style = MaterialTheme.typography.bodyLarge,
+                )
+
+                val percent = (result.similarity * 100).toInt()
+                Text(
+                    text = if (result.similarity >= PASSING_SIMILARITY) {
+                        "${ui.matchedLabel} ($percent%)"
+                    } else {
+                        "${ui.retryLabel} ($percent%)"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
 
-            similarity?.let { score ->
-                val percent = (score * 100).toInt()
-                if (score >= PASSING_SIMILARITY) {
-                    Text(
-                        text = "${ui.matchedLabel} ($percent%)",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                } else {
-                    Text(
-                        text = "${ui.retryLabel} ($percent%)",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-            }
-
-            if (similarity == null && completed) {
+            if (attempt == null && completed) {
                 Text(
                     text = ui.completedLabel,
                     style = MaterialTheme.typography.labelLarge,
@@ -343,8 +277,7 @@ private fun koreanSimilarity(spoken: String, target: String): Float {
 }
 
 private fun normalizeKoreanSpeech(value: String): String =
-    value.lowercase(Locale.KOREAN)
-        .filter { it.isLetterOrDigit() }
+    value.lowercase(Locale.KOREAN).filter { it.isLetterOrDigit() }
 
 private fun levenshteinDistance(left: String, right: String): Int {
     var previous = IntArray(right.length + 1) { it }
@@ -369,97 +302,85 @@ private fun levenshteinDistance(left: String, right: String): Int {
 private fun speakingUiText(languageCode: String?): SpeakingUiText = when (languageCode) {
     "es" -> SpeakingUiText(
         title = "Habla coreano",
-        intro = "Mira una frase útil, dilo en voz alta y compara lo que reconoció el dispositivo. La evaluación se hace con reconocimiento de voz coreano en el dispositivo.",
+        intro = "Lee una frase útil, dilo en voz alta y compara lo que reconoció el dispositivo. La comprobación usa reconocimiento de voz coreano sin conexión cuando está disponible.",
         targetLabel = "Di esta frase",
         speakLabel = "Hablar",
-        listeningLabel = "Escuchando…",
         recognizedLabel = "Reconocido",
         matchedLabel = "¡Muy bien! La frase coincide.",
         retryLabel = "Casi. Inténtalo otra vez.",
         completedLabel = "Práctica oral completada",
-        unavailableLabel = "Este dispositivo no tiene reconocimiento de voz coreano sin conexión disponible. Puedes continuar estudiando, pero la comprobación por voz queda desactivada.",
-        permissionDeniedLabel = "Se necesita permiso de micrófono para practicar la pronunciación.",
-        errorLabel = "No pude reconocer la voz. Inténtalo otra vez en un lugar más silencioso.",
+        unavailableLabel = "El reconocimiento de voz coreano sin conexión no está disponible en este dispositivo. Puedes seguir estudiando, pero la comprobación por voz queda desactivada.",
+        canceledLabel = "La escucha se canceló. Inténtalo otra vez cuando quieras.",
         continueLabel = "Continuar a conversación",
     )
 
     "fr" -> SpeakingUiText(
         title = "Parler coréen",
-        intro = "Lis une phrase utile, dis-la à voix haute et compare ce que l'appareil a reconnu. L'évaluation utilise la reconnaissance vocale coréenne sur l'appareil.",
+        intro = "Lis une phrase utile, dis-la à voix haute et compare ce que l'appareil a reconnu. La vérification utilise la reconnaissance vocale coréenne hors ligne lorsqu'elle est disponible.",
         targetLabel = "Dis cette phrase",
         speakLabel = "Parler",
-        listeningLabel = "Écoute…",
         recognizedLabel = "Reconnu",
         matchedLabel = "Très bien ! La phrase correspond.",
         retryLabel = "Presque. Réessaie.",
         completedLabel = "Expression orale terminée",
         unavailableLabel = "La reconnaissance vocale coréenne hors ligne n'est pas disponible sur cet appareil. Tu peux continuer à apprendre, mais la vérification vocale est désactivée.",
-        permissionDeniedLabel = "L'autorisation du microphone est nécessaire pour pratiquer la prononciation.",
-        errorLabel = "La voix n'a pas été reconnue. Réessaie dans un endroit plus calme.",
+        canceledLabel = "L'écoute a été annulée. Réessaie quand tu veux.",
         continueLabel = "Continuer vers la conversation",
     )
 
     "vi" -> SpeakingUiText(
         title = "Nói tiếng Hàn",
-        intro = "Xem một câu hữu ích, nói thành tiếng rồi so sánh với kết quả thiết bị nhận dạng. Việc kiểm tra dùng nhận dạng giọng nói tiếng Hàn ngay trên thiết bị.",
+        intro = "Xem một câu hữu ích, nói thành tiếng rồi so sánh với kết quả thiết bị nhận dạng. Ứng dụng ưu tiên nhận dạng giọng nói tiếng Hàn ngoại tuyến trên thiết bị.",
         targetLabel = "Hãy nói câu này",
         speakLabel = "Nói",
-        listeningLabel = "Đang nghe…",
         recognizedLabel = "Đã nhận dạng",
         matchedLabel = "Rất tốt! Câu nói khớp.",
         retryLabel = "Gần đúng rồi. Hãy thử lại.",
         completedLabel = "Đã hoàn thành luyện nói",
         unavailableLabel = "Thiết bị này không có nhận dạng giọng nói tiếng Hàn ngoại tuyến. Bạn vẫn có thể học tiếp nhưng chức năng kiểm tra giọng nói sẽ bị tắt.",
-        permissionDeniedLabel = "Cần quyền sử dụng micrô để luyện phát âm.",
-        errorLabel = "Không nhận dạng được giọng nói. Hãy thử lại ở nơi yên tĩnh hơn.",
+        canceledLabel = "Đã hủy nghe. Bạn có thể thử lại bất cứ lúc nào.",
         continueLabel = "Tiếp tục sang hội thoại",
     )
 
     "th" -> SpeakingUiText(
         title = "พูดภาษาเกาหลี",
-        intro = "ดูประโยคที่ใช้จริง พูดออกเสียง แล้วเปรียบเทียบกับข้อความที่อุปกรณ์ฟังได้ การตรวจใช้การรู้จำเสียงภาษาเกาหลีบนอุปกรณ์",
+        intro = "ดูประโยคที่ใช้จริง พูดออกเสียง แล้วเปรียบเทียบกับข้อความที่อุปกรณ์ฟังได้ โดยให้ความสำคัญกับการรู้จำเสียงภาษาเกาหลีแบบออฟไลน์บนอุปกรณ์",
         targetLabel = "พูดประโยคนี้",
         speakLabel = "พูด",
-        listeningLabel = "กำลังฟัง…",
         recognizedLabel = "ฟังได้ว่า",
         matchedLabel = "ดีมาก! ประโยคตรงกัน",
         retryLabel = "เกือบแล้ว ลองอีกครั้ง",
         completedLabel = "ฝึกพูดเสร็จแล้ว",
         unavailableLabel = "อุปกรณ์นี้ไม่มีการรู้จำเสียงภาษาเกาหลีแบบออฟไลน์ คุณยังเรียนต่อได้ แต่การตรวจเสียงจะถูกปิด",
-        permissionDeniedLabel = "ต้องอนุญาตใช้ไมโครโฟนเพื่อฝึกออกเสียง",
-        errorLabel = "ไม่สามารถรู้จำเสียงได้ ลองอีกครั้งในที่เงียบกว่า",
+        canceledLabel = "ยกเลิกการฟังแล้ว ลองใหม่ได้ทุกเมื่อ",
         continueLabel = "ไปฝึกสนทนา",
     )
 
     "id" -> SpeakingUiText(
         title = "Berbicara bahasa Korea",
-        intro = "Lihat kalimat yang berguna, ucapkan dengan suara keras, lalu bandingkan hasil yang dikenali perangkat. Penilaian memakai pengenal suara Korea di perangkat.",
+        intro = "Lihat kalimat yang berguna, ucapkan dengan suara keras, lalu bandingkan hasil yang dikenali perangkat. Aplikasi memprioritaskan pengenal suara Korea offline di perangkat.",
         targetLabel = "Ucapkan kalimat ini",
         speakLabel = "Bicara",
-        listeningLabel = "Mendengarkan…",
         recognizedLabel = "Dikenali",
         matchedLabel = "Bagus! Kalimatnya cocok.",
         retryLabel = "Hampir. Coba lagi.",
         completedLabel = "Latihan berbicara selesai",
         unavailableLabel = "Pengenalan suara Korea offline tidak tersedia di perangkat ini. Anda tetap dapat belajar, tetapi pemeriksaan suara dinonaktifkan.",
-        permissionDeniedLabel = "Izin mikrofon diperlukan untuk latihan pengucapan.",
-        errorLabel = "Suara tidak dapat dikenali. Coba lagi di tempat yang lebih tenang.",
+        canceledLabel = "Pengenalan suara dibatalkan. Coba lagi kapan saja.",
         continueLabel = "Lanjut ke percakapan",
     )
 
     else -> SpeakingUiText(
         title = "Speak Korean",
-        intro = "Read a useful sentence, say it aloud, and compare what your device recognized. Scoring uses Korean on-device speech recognition.",
+        intro = "Read a useful sentence, say it aloud, and compare what your device recognized. The app prefers Korean on-device speech recognition so practice can stay offline.",
         targetLabel = "Say this sentence",
         speakLabel = "Speak",
-        listeningLabel = "Listening…",
         recognizedLabel = "Recognized",
         matchedLabel = "Great! Your sentence matched.",
         retryLabel = "Almost. Try it again.",
         completedLabel = "Speaking completed",
         unavailableLabel = "Offline Korean speech recognition is not available on this device. You can keep learning, but voice checking is disabled.",
-        permissionDeniedLabel = "Microphone permission is required for speaking practice.",
-        errorLabel = "I could not recognize the speech. Try again somewhere quieter.",
+        canceledLabel = "Listening was canceled. Try again whenever you are ready.",
         continueLabel = "Continue to conversation",
     )
 }

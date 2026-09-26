@@ -16,6 +16,7 @@ import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.ListeningScreen
 import com.yamone.korean.ui.screens.SentenceScreen
+import com.yamone.korean.ui.screens.SpeakingScreen
 import com.yamone.korean.ui.screens.SettingsScreen
 import com.yamone.korean.ui.screens.SyllableScreen
 import com.yamone.korean.ui.screens.TraceScreen
@@ -191,6 +192,24 @@ fun YamoneKoreanNavHost(
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Listening.route, lessonId)
+                                }
+                            },
+                            onLessonCompleted = { lessonId ->
+                                scope.launch {
+                                    onLessonCompleted(lessonId)
+                                }
+                            },
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Speaking -> {
+                        SpeakingScreen(
+                            languageCode = initialLanguageCode,
+                            completedLessonIds = learningProgress.completedLessonIds,
+                            onLessonOpened = { lessonId ->
+                                scope.launch {
+                                    onLessonOpened(AppDestination.Speaking.route, lessonId)
                                 }
                             },
                             onLessonCompleted = { lessonId ->
