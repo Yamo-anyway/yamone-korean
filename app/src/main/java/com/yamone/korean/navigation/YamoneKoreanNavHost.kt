@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.yamone.korean.data.LearningProgressState
+import com.yamone.korean.ui.screens.ConversationScreen
 import com.yamone.korean.ui.screens.HomeScreen
 import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
@@ -229,6 +230,24 @@ fun YamoneKoreanNavHost(
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Expression.route, lessonId)
+                                }
+                            },
+                            onLessonCompleted = { lessonId ->
+                                scope.launch {
+                                    onLessonCompleted(lessonId)
+                                }
+                            },
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Conversation -> {
+                        ConversationScreen(
+                            languageCode = initialLanguageCode,
+                            completedLessonIds = learningProgress.completedLessonIds,
+                            onLessonOpened = { lessonId ->
+                                scope.launch {
+                                    onLessonOpened(AppDestination.Conversation.route, lessonId)
                                 }
                             },
                             onLessonCompleted = { lessonId ->
