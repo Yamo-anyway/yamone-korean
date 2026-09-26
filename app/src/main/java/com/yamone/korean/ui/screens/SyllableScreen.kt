@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yamone.korean.learning.BasicSyllableCatalog
 import com.yamone.korean.learning.BasicSyllableLesson
+import com.yamone.korean.learning.FinalConsonantReadingCatalog
 import com.yamone.korean.learning.SyllableVowelPlacement
 
 private data class SyllableScreenText(
@@ -160,6 +161,43 @@ fun SyllableScreen(
         }
 
         item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        text = finalConsonantTitle(languageCode),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = finalConsonantIntro(languageCode),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    FinalConsonantReadingCatalog.examples.forEach { example ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = example.syllable + "  " + example.soundGuide,
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            Text(
+                                text = example.meaning(languageCode),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
+                        Text(
+                            text = example.decomposition + " · 받침 " + example.finalConsonant,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -210,6 +248,24 @@ private fun SyllableCombinationCard(
             )
         }
     }
+}
+
+private fun finalConsonantTitle(languageCode: String?): String = when (languageCode) {
+    "es" -> "Leer palabras con 받침"
+    "fr" -> "Lire des mots avec 받침"
+    "vi" -> "Đọc từ có 받침"
+    "th" -> "อ่านคำที่มี 받침"
+    "id" -> "Membaca kata dengan 받침"
+    else -> "Read words with 받침"
+}
+
+private fun finalConsonantIntro(languageCode: String?): String = when (languageCode) {
+    "es" -> "받침 es la consonante final debajo de la sílaba. Practica 7 finales básicos con palabras reales."
+    "fr" -> "Le 받침 est la consonne finale sous la syllabe. Pratique 7 finales de base avec de vrais mots."
+    "vi" -> "받침 là phụ âm cuối ở dưới âm tiết. Luyện 7 âm cuối cơ bản bằng từ thật."
+    "th" -> "받침 คือตัวสะกดใต้พยางค์ ฝึกเสียงท้ายพื้นฐาน 7 แบบด้วยคำที่ใช้จริง"
+    "id" -> "받침 adalah konsonan akhir di bawah suku kata. Latih 7 bunyi akhir dasar lewat kata nyata."
+    else -> "받침 is the final consonant at the bottom of a syllable. Practice 7 basic finals with real words."
 }
 
 private fun syllableScreenText(languageCode: String?): SyllableScreenText = when (languageCode) {
