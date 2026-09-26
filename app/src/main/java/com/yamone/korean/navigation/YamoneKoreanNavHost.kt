@@ -17,6 +17,7 @@ import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.SettingsScreen
 import com.yamone.korean.ui.screens.SyllableScreen
 import com.yamone.korean.ui.screens.TraceScreen
+import com.yamone.korean.ui.screens.WordScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -139,6 +140,24 @@ fun YamoneKoreanNavHost(
                             onQuizAnswered = { lessonId, isCorrect ->
                                 scope.launch {
                                     onSyllableQuizAnswered(lessonId, isCorrect)
+                                }
+                            },
+                            onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Word -> {
+                        WordScreen(
+                            languageCode = initialLanguageCode,
+                            completedLessonIds = learningProgress.completedLessonIds,
+                            onLessonOpened = { lessonId ->
+                                scope.launch {
+                                    onLessonOpened(AppDestination.Word.route, lessonId)
+                                }
+                            },
+                            onLessonCompleted = { lessonId ->
+                                scope.launch {
+                                    onLessonCompleted(lessonId)
                                 }
                             },
                             onContinue = onNext ?: {},
