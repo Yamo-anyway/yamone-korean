@@ -90,7 +90,7 @@ fun HomeScreen(
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
-                text = "Letters → writing → words → sentences → listening → speaking",
+                text = "Quick Hangul → words → sentences → listening → speaking → my expressions → conversation",
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -197,7 +197,9 @@ private fun stageDescription(destination: AppDestination): String = when (destin
     AppDestination.Word -> "Read and write high-frequency Korean words."
     AppDestination.Sentence -> "Build and understand short everyday Korean sentences."
     AppDestination.Listening -> "Listen at slow and natural speed and identify what was said."
-    AppDestination.Speaking -> "Listen, repeat and practice producing your own Korean expressions."
+    AppDestination.Speaking -> "Listen and repeat useful Korean sentences."
+    AppDestination.Expression -> "Choose words that are true for you, build your own Korean sentence and say it aloud."
+    AppDestination.Conversation -> "Use your Korean in short question-and-answer conversations."
     AppDestination.Review -> "Repeat letters, words and sentences that need more practice."
     else -> ""
 }
