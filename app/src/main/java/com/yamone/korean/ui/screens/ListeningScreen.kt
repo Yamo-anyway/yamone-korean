@@ -45,6 +45,7 @@ fun ListeningScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -121,6 +122,7 @@ fun ListeningScreen(
                     speak(lesson.korean, 1.0f, "${listeningId}_natural")
                 },
                 onCompleted = { onLessonCompleted(listeningId) },
+                onNeedsReview = { onLessonNeedsReview(listeningId) },
             )
         }
 
@@ -146,6 +148,7 @@ private fun ListeningLessonCard(
     onSlow: () -> Unit,
     onNatural: () -> Unit,
     onCompleted: () -> Unit,
+    onNeedsReview: () -> Unit,
 ) {
     var selectedAnswer by remember(lesson.id) { mutableStateOf<String?>(null) }
     var result by remember(lesson.id) { mutableStateOf<Boolean?>(null) }
@@ -200,7 +203,11 @@ private fun ListeningLessonCard(
                         selectedAnswer = answer
                         val isCorrect = answer == lesson.korean
                         result = isCorrect
-                        if (isCorrect) onCompleted()
+                        if (isCorrect) {
+                            onCompleted()
+                        } else {
+                            onNeedsReview()
+                        }
                     },
                 ) {
                     Text(answer)

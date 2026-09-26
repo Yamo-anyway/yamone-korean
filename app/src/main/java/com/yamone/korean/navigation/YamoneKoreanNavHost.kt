@@ -16,6 +16,7 @@ import com.yamone.korean.ui.screens.JamoScreen
 import com.yamone.korean.ui.screens.LanguageSelectionScreen
 import com.yamone.korean.ui.screens.LearningStageScreen
 import com.yamone.korean.ui.screens.ListeningScreen
+import com.yamone.korean.ui.screens.ReviewScreen
 import com.yamone.korean.ui.screens.SelfExpressionScreen
 import com.yamone.korean.ui.screens.SentenceScreen
 import com.yamone.korean.ui.screens.SpeakingScreen
@@ -34,6 +35,8 @@ fun YamoneKoreanNavHost(
     onStageOpened: suspend (String) -> Unit,
     onLessonOpened: suspend (String, String) -> Unit,
     onLessonCompleted: suspend (String) -> Unit,
+    onLessonNeedsReview: suspend (String) -> Unit,
+    onReviewResolved: suspend (String) -> Unit,
     onSyllableQuizAnswered: suspend (lessonId: String, isCorrect: Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -183,6 +186,11 @@ fun YamoneKoreanNavHost(
                                     onLessonCompleted(lessonId)
                                 }
                             },
+                            onLessonNeedsReview = { lessonId ->
+                                scope.launch {
+                                    onLessonNeedsReview(lessonId)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }
@@ -199,6 +207,11 @@ fun YamoneKoreanNavHost(
                             onLessonCompleted = { lessonId ->
                                 scope.launch {
                                     onLessonCompleted(lessonId)
+                                }
+                            },
+                            onLessonNeedsReview = { lessonId ->
+                                scope.launch {
+                                    onLessonNeedsReview(lessonId)
                                 }
                             },
                             onContinue = onNext ?: {},
@@ -256,6 +269,18 @@ fun YamoneKoreanNavHost(
                                 }
                             },
                             onContinue = onNext ?: {},
+                        )
+                    }
+
+                    AppDestination.Review -> {
+                        ReviewScreen(
+                            languageCode = initialLanguageCode,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
+                            onReviewResolved = { lessonId ->
+                                scope.launch {
+                                    onReviewResolved(lessonId)
+                                }
+                            },
                         )
                     }
 

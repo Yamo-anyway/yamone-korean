@@ -44,6 +44,7 @@ fun SentenceScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val ui = sentenceUiText(languageCode)
@@ -77,6 +78,7 @@ fun SentenceScreen(
                 ui = ui,
                 onOpened = { onLessonOpened(lesson.id) },
                 onCompleted = { onLessonCompleted(lesson.id) },
+                onNeedsReview = { onLessonNeedsReview(lesson.id) },
             )
         }
 
@@ -101,6 +103,7 @@ private fun SentenceLessonCard(
     ui: SentenceUiText,
     onOpened: () -> Unit,
     onCompleted: () -> Unit,
+    onNeedsReview: () -> Unit,
 ) {
     var selectedChunks by remember(lesson.id) { mutableStateOf(emptyList<String>()) }
     var result by remember(lesson.id) { mutableStateOf<Boolean?>(null) }
@@ -150,7 +153,11 @@ private fun SentenceLessonCard(
                         if (nextSelection.size == lesson.correctChunks.size) {
                             val isCorrect = nextSelection == lesson.correctChunks
                             result = isCorrect
-                            if (isCorrect) onCompleted()
+                            if (isCorrect) {
+                                onCompleted()
+                            } else {
+                                onNeedsReview()
+                            }
                         }
                     },
                 ) {
