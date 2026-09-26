@@ -57,6 +57,7 @@ fun SpeakingScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -91,15 +92,18 @@ fun SpeakingScreen(
             .map { candidate -> candidate to koreanSimilarity(candidate, lesson.korean) }
             .maxByOrNull { it.second }
 
+        val similarity = best?.second ?: 0f
         attempts = attempts + (
             speakingId to SpeakingAttempt(
                 recognizedText = best?.first.orEmpty(),
-                similarity = best?.second ?: 0f,
+                similarity = similarity,
             )
         )
 
-        if ((best?.second ?: 0f) >= PASSING_SIMILARITY) {
+        if (similarity >= PASSING_SIMILARITY) {
             onLessonCompleted(speakingId)
+        } else {
+            onLessonNeedsReview(speakingId)
         }
 
         statusMessage = null
