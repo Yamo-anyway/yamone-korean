@@ -14,6 +14,8 @@ enum class AppDestination(
     Sentence("sentence", "Sentences"),
     Listening("listening", "Listening"),
     Speaking("speaking", "Speaking"),
+    Expression("expression", "My expressions"),
+    Conversation("conversation", "Conversation"),
     Review("review", "Review"),
     Settings("settings", "Settings"),
 }
@@ -27,5 +29,7 @@ val learningDestinations = listOf(
     AppDestination.Sentence,
     AppDestination.Listening,
     AppDestination.Speaking,
+    AppDestination.Expression,
+    AppDestination.Conversation,
     AppDestination.Review,
 )
