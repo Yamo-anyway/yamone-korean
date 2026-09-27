@@ -148,7 +148,7 @@ private fun stageProgressLabels(languageCode: String?): StageProgressLabels = wh
     else -> StageProgressLabels("Progress by stage", "Completed", "Needs review")
 }
 
-private fun localizedProgressStageTitle(
+internal fun localizedProgressStageTitle(
     destination: AppDestination,
     languageCode: String?,
 ): String = when (languageCode) {
