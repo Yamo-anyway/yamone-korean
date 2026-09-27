@@ -64,6 +64,7 @@ fun SelfExpressionScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -87,6 +88,7 @@ fun SelfExpressionScreen(
 
         val lessonId = "expression_${lesson.id}"
         if (result.resultCode != Activity.RESULT_OK) {
+            onLessonNeedsReview(lessonId)
             statusMessage = ui.canceledLabel
             activeLesson = null
             activeChoice = null
@@ -110,6 +112,8 @@ fun SelfExpressionScreen(
 
         if ((best?.second ?: 0f) >= EXPRESSION_PASSING_SIMILARITY) {
             onLessonCompleted(lessonId)
+        } else {
+            onLessonNeedsReview(lessonId)
         }
 
         activeLesson = null
