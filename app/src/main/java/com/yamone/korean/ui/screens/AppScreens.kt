@@ -75,6 +75,7 @@ fun LanguageSelectionScreen(
 
 @Composable
 fun HomeScreen(
+    languageCode: String?,
     learningProgress: LearningProgressState,
     onOpenDestination: (AppDestination) -> Unit,
     onOpenSettings: () -> Unit,
@@ -98,6 +99,11 @@ fun HomeScreen(
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                 text = "Quick Hangul → syllables & final consonants → words → sentences → listening → speaking → real conversation",
                 style = MaterialTheme.typography.bodyMedium,
+            )
+            HomeProgressSummary(
+                languageCode = languageCode,
+                learningProgress = learningProgress,
+                onOpenReview = { onOpenDestination(AppDestination.Review) },
             )
             if (resumeDestination != null) {
                 Button(
