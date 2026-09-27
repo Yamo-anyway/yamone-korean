@@ -82,7 +82,7 @@ fun ReviewScreen(
                 }
             }
         } else {
-            ReviewCategory.entries.forEach { category ->
+            ReviewCategory.values().forEach { category ->
                 val ids = grouped[category].orEmpty()
                 if (ids.isNotEmpty()) {
                     item(key = "header_${category.name}") {

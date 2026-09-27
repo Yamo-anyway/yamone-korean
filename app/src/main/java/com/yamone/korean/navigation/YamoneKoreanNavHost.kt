@@ -42,6 +42,7 @@ fun YamoneKoreanNavHost(
     val scope = rememberCoroutineScope()
     var requestedTraceLessonId by rememberSaveable { mutableStateOf<String?>(null) }
     var guidedSentenceId by rememberSaveable { mutableStateOf<String?>(null) }
+    var reviewFocusLessonId by rememberSaveable { mutableStateOf<String?>(null) }
     val startDestination = when {
         initialLanguageCode == null -> AppDestination.Language.route
         learningProgress.currentStageRoute == AppDestination.Trace.route &&
@@ -90,6 +91,12 @@ fun YamoneKoreanNavHost(
                             destination == AppDestination.Speaking
                         ) {
                             guidedSentenceId = null
+                        }
+                        if (
+                            destination == AppDestination.Expression ||
+                            destination == AppDestination.Conversation
+                        ) {
+                            reviewFocusLessonId = null
                         }
                         onStageOpened(destination.route)
                         navController.navigate(destination.route)
@@ -267,6 +274,7 @@ fun YamoneKoreanNavHost(
                         SelfExpressionScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            focusLessonId = reviewFocusLessonId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Expression.route, lessonId)
@@ -290,6 +298,7 @@ fun YamoneKoreanNavHost(
                         ConversationScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            focusLessonId = reviewFocusLessonId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Conversation.route, lessonId)
@@ -315,6 +324,7 @@ fun YamoneKoreanNavHost(
                             reviewLessonIds = learningProgress.reviewLessonIds,
                             onPracticeLesson = { lessonId ->
                                 scope.launch {
+                                    reviewFocusLessonId = null
                                     val target = when {
                                         lessonId.startsWith("listening_") -> {
                                             guidedSentenceId = lessonId.removePrefix("listening_")
@@ -324,8 +334,14 @@ fun YamoneKoreanNavHost(
                                             guidedSentenceId = lessonId.removePrefix("speaking_")
                                             AppDestination.Speaking
                                         }
-                                        lessonId.startsWith("expression_") -> AppDestination.Expression
-                                        lessonId.startsWith("conversation_") -> AppDestination.Conversation
+                                        lessonId.startsWith("expression_") -> {
+                                            reviewFocusLessonId = lessonId.removePrefix("expression_")
+                                            AppDestination.Expression
+                                        }
+                                        lessonId.startsWith("conversation_") -> {
+                                            reviewFocusLessonId = lessonId.removePrefix("conversation_")
+                                            AppDestination.Conversation
+                                        }
                                         lessonId.startsWith("word_") -> AppDestination.Word
                                         lessonId.startsWith("sentence_") -> {
                                             guidedSentenceId = lessonId

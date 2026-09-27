@@ -62,6 +62,7 @@ private data class ExpressionAttempt(
 fun SelfExpressionScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
     onLessonNeedsReview: (String) -> Unit,
@@ -69,6 +70,15 @@ fun SelfExpressionScreen(
 ) {
     val context = LocalContext.current
     val ui = expressionUiText(languageCode)
+    val orderedLessons = remember(focusLessonId) {
+        if (focusLessonId == null) {
+            SelfExpressionCatalog.lessons
+        } else {
+            SelfExpressionCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == focusLessonId) 0 else 1
+            }
+        }
+    }
     val onDeviceRecognitionAvailable = remember(context) {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
@@ -177,7 +187,7 @@ fun SelfExpressionScreen(
         }
 
         items(
-            items = SelfExpressionCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             val lessonId = "expression_${lesson.id}"

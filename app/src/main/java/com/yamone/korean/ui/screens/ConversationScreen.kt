@@ -68,6 +68,7 @@ private data class ConversationAttempt(
 fun ConversationScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
     onLessonNeedsReview: (String) -> Unit,
@@ -75,6 +76,15 @@ fun ConversationScreen(
 ) {
     val context = LocalContext.current
     val ui = conversationUiText(languageCode)
+    val orderedLessons = remember(focusLessonId) {
+        if (focusLessonId == null) {
+            ConversationCatalog.lessons
+        } else {
+            ConversationCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == focusLessonId) 0 else 1
+            }
+        }
+    }
     val speechAvailable = remember(context) {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
@@ -220,7 +230,7 @@ fun ConversationScreen(
         }
 
         items(
-            items = ConversationCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             val lessonId = "conversation_${lesson.id}"
