@@ -11,5 +11,5 @@ data class GuidedPracticePack(
 }
 
 object GuidedPracticeCatalog {
-    val packs: List<GuidedPracticePack> = emptyList()
+    val packs: List<GuidedPracticePack> = listOf()
 }
