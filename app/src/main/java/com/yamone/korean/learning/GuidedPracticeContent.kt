@@ -16,7 +16,7 @@ object GuidedPracticeCatalog {
             id = "cafe",
             sentenceId = "sentence_order_one",
             wordIds = listOf("word_bibimbap"),
-            titles = mapOf("en" to "Cafe practice"),
+            titles = mapOf("en" to "Cafe practice", "es" to "Practica de cafeteria"),
         ),
         GuidedPracticePack(
             id = "price",
