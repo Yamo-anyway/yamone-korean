@@ -57,6 +57,7 @@ fun SpeakingScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -78,6 +79,7 @@ fun SpeakingScreen(
 
         val speakingId = "speaking_${lesson.id}"
         if (result.resultCode != Activity.RESULT_OK) {
+            onLessonNeedsReview(speakingId)
             statusMessage = ui.canceledLabel
             activeLesson = null
             return@rememberLauncherForActivityResult
@@ -100,6 +102,8 @@ fun SpeakingScreen(
 
         if ((best?.second ?: 0f) >= PASSING_SIMILARITY) {
             onLessonCompleted(speakingId)
+        } else {
+            onLessonNeedsReview(speakingId)
         }
 
         statusMessage = null
