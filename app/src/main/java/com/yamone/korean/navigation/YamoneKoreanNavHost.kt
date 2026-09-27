@@ -232,6 +232,11 @@ fun YamoneKoreanNavHost(
                                     onLessonCompleted(lessonId)
                                 }
                             },
+                            onLessonNeedsReview = { lessonId ->
+                                scope.launch {
+                                    onLessonNeedsReview(lessonId)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }
@@ -250,6 +255,11 @@ fun YamoneKoreanNavHost(
                                     onLessonCompleted(lessonId)
                                 }
                             },
+                            onLessonNeedsReview = { lessonId ->
+                                scope.launch {
+                                    onLessonNeedsReview(lessonId)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }
@@ -266,6 +276,11 @@ fun YamoneKoreanNavHost(
                             onLessonCompleted = { lessonId ->
                                 scope.launch {
                                     onLessonCompleted(lessonId)
+                                }
+                            },
+                            onLessonNeedsReview = { lessonId ->
+                                scope.launch {
+                                    onLessonNeedsReview(lessonId)
                                 }
                             },
                             onContinue = onNext ?: {},
