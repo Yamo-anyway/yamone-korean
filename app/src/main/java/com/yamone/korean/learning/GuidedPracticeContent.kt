@@ -18,5 +18,11 @@ object GuidedPracticeCatalog {
             wordIds = listOf("word_bibimbap"),
             titles = mapOf("en" to "Cafe practice"),
         ),
+        GuidedPracticePack(
+            id = "price",
+            sentenceId = "sentence_price_question",
+            wordIds = listOf("word_eolma"),
+            titles = mapOf("en" to "Price practice"),
+        ),
     )
 }
