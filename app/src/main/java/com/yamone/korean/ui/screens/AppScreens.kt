@@ -103,6 +103,7 @@ fun HomeScreen(
             HomeProgressSummary(
                 languageCode = languageCode,
                 learningProgress = learningProgress,
+                onOpenStage = onOpenDestination,
                 onOpenReview = { onOpenDestination(AppDestination.Review) },
             )
             if (resumeDestination != null) {
