@@ -17,6 +17,7 @@ data class LearningProgressState(
     val currentLessonId: String? = null,
     val completedLessonIds: Set<String> = emptySet(),
     val reviewLessonIds: Set<String> = emptySet(),
+    val masteredSyllableLessonIds: Set<String> = emptySet(),
     val syllableQuizAnsweredCount: Int = 0,
     val syllableQuizCorrectCount: Int = 0,
     val syllableQuizIncorrectCount: Int = 0,
@@ -31,6 +32,7 @@ class LearningProgressRepository(private val context: Context) {
                 currentLessonId = preferences[CURRENT_LESSON_ID_KEY],
                 completedLessonIds = preferences[COMPLETED_LESSON_IDS_KEY].orEmpty(),
                 reviewLessonIds = preferences[REVIEW_LESSON_IDS_KEY].orEmpty(),
+                masteredSyllableLessonIds = preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY].orEmpty(),
                 syllableQuizAnsweredCount = preferences[SYLLABLE_QUIZ_ANSWERED_COUNT_KEY] ?: 0,
                 syllableQuizCorrectCount = preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] ?: 0,
                 syllableQuizIncorrectCount = preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] ?: 0,
@@ -76,9 +78,15 @@ class LearningProgressRepository(private val context: Context) {
             if (isCorrect) {
                 preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] =
                     (preferences[SYLLABLE_QUIZ_CORRECT_COUNT_KEY] ?: 0) + 1
+                preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY] =
+                    preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY].orEmpty() + lessonId
+                preferences[REVIEW_LESSON_IDS_KEY] =
+                    preferences[REVIEW_LESSON_IDS_KEY].orEmpty() - lessonId
             } else {
                 preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] =
                     (preferences[SYLLABLE_QUIZ_INCORRECT_COUNT_KEY] ?: 0) + 1
+                preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY] =
+                    preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY].orEmpty() - lessonId
                 preferences[REVIEW_LESSON_IDS_KEY] =
                     preferences[REVIEW_LESSON_IDS_KEY].orEmpty() + lessonId
             }
@@ -90,6 +98,7 @@ class LearningProgressRepository(private val context: Context) {
         private val CURRENT_LESSON_ID_KEY = stringPreferencesKey("current_lesson_id")
         private val COMPLETED_LESSON_IDS_KEY = stringSetPreferencesKey("completed_lesson_ids")
         private val REVIEW_LESSON_IDS_KEY = stringSetPreferencesKey("review_lesson_ids")
+        private val MASTERED_SYLLABLE_LESSON_IDS_KEY = stringSetPreferencesKey("mastered_syllable_lesson_ids")
         private val SYLLABLE_QUIZ_ANSWERED_COUNT_KEY = intPreferencesKey("syllable_quiz_answered_count")
         private val SYLLABLE_QUIZ_CORRECT_COUNT_KEY = intPreferencesKey("syllable_quiz_correct_count")
         private val SYLLABLE_QUIZ_INCORRECT_COUNT_KEY = intPreferencesKey("syllable_quiz_incorrect_count")
