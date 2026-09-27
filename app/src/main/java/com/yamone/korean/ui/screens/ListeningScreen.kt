@@ -43,6 +43,7 @@ private data class ListeningUiText(
 fun ListeningScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    focusSentenceId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
     onLessonNeedsReview: (String) -> Unit,
@@ -50,6 +51,15 @@ fun ListeningScreen(
 ) {
     val context = LocalContext.current
     val ui = listeningUiText(languageCode)
+    val orderedLessons = remember(focusSentenceId) {
+        if (focusSentenceId == null) {
+            BasicSentenceCatalog.lessons
+        } else {
+            BasicSentenceCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == focusSentenceId) 0 else 1
+            }
+        }
+    }
     var ttsReady by remember { mutableStateOf(false) }
     var ttsEngine by remember { mutableStateOf<TextToSpeech?>(null) }
 
@@ -104,7 +114,7 @@ fun ListeningScreen(
         }
 
         items(
-            items = BasicSentenceCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             val listeningId = "listening_${lesson.id}"
@@ -246,54 +256,54 @@ private fun ListeningLessonCard(
 private fun listeningUiText(languageCode: String?): ListeningUiText = when (languageCode) {
     "es" -> ListeningUiText(
         title = "Escucha coreano real",
-        intro = "Escucha primero sin mirar la respuesta. Empieza despacio, luego escucha a velocidad natural y elige la frase que oíste.",
+        intro = "Escucha primero sin mirar la respuesta. Empieza despacio, luego escucha a velocidad natural y elige la frase que o\u00edste.",
         slowLabel = "Escuchar despacio",
         naturalLabel = "Escuchar natural",
-        chooseLabel = "¿Qué frase escuchaste?",
-        correctLabel = "¡Correcto! Reconociste la frase.",
-        retryLabel = "Todavía no. Escúchala otra vez.",
+        chooseLabel = "\u00bfQu\u00e9 frase escuchaste?",
+        correctLabel = "\u00a1Correcto! Reconociste la frase.",
+        retryLabel = "Todav\u00eda no. Esc\u00fachala otra vez.",
         completedLabel = "Escucha completada",
-        unavailableLabel = "La voz coreana no está instalada en este dispositivo. Instala una voz coreana sin conexión para usar el audio.",
+        unavailableLabel = "La voz coreana no est\u00e1 instalada en este dispositivo. Instala una voz coreana sin conexi\u00f3n para usar el audio.",
         continueLabel = "Continuar a hablar",
     )
 
     "fr" -> ListeningUiText(
-        title = "Écouter du coréen réel",
-        intro = "Écoute d'abord sans regarder la réponse. Commence lentement, puis à vitesse naturelle, et choisis la phrase entendue.",
-        slowLabel = "Écouter lentement",
-        naturalLabel = "Écouter naturellement",
+        title = "\u00c9couter du cor\u00e9en r\u00e9el",
+        intro = "\u00c9coute d'abord sans regarder la r\u00e9ponse. Commence lentement, puis \u00e0 vitesse naturelle, et choisis la phrase entendue.",
+        slowLabel = "\u00c9couter lentement",
+        naturalLabel = "\u00c9couter naturellement",
         chooseLabel = "Quelle phrase as-tu entendue ?",
         correctLabel = "Correct ! Tu as reconnu la phrase.",
-        retryLabel = "Pas encore. Écoute encore une fois.",
-        completedLabel = "Écoute terminée",
-        unavailableLabel = "La voix coréenne n'est pas installée sur cet appareil. Installe une voix coréenne hors ligne pour utiliser l'audio.",
+        retryLabel = "Pas encore. \u00c9coute encore une fois.",
+        completedLabel = "\u00c9coute termin\u00e9e",
+        unavailableLabel = "La voix cor\u00e9enne n'est pas install\u00e9e sur cet appareil. Installe une voix cor\u00e9enne hors ligne pour utiliser l'audio.",
         continueLabel = "Continuer vers l'oral",
     )
 
     "vi" -> ListeningUiText(
-        title = "Nghe tiếng Hàn thực tế",
-        intro = "Hãy nghe trước khi nhìn đáp án. Bắt đầu với tốc độ chậm, sau đó nghe tốc độ tự nhiên và chọn câu bạn vừa nghe.",
-        slowLabel = "Nghe chậm",
-        naturalLabel = "Nghe tự nhiên",
-        chooseLabel = "Bạn đã nghe câu nào?",
-        correctLabel = "Đúng rồi! Bạn đã nhận ra câu.",
-        retryLabel = "Chưa đúng. Hãy nghe lại.",
-        completedLabel = "Đã hoàn thành nghe",
-        unavailableLabel = "Thiết bị chưa có giọng tiếng Hàn. Hãy cài giọng tiếng Hàn ngoại tuyến để dùng âm thanh.",
-        continueLabel = "Tiếp tục sang nói",
+        title = "Nghe ti\u1ebfng H\u00e0n th\u1ef1c t\u1ebf",
+        intro = "H\u00e3y nghe tr\u01b0\u1edbc khi nh\u00ecn \u0111\u00e1p \u00e1n. B\u1eaft \u0111\u1ea7u v\u1edbi t\u1ed1c \u0111\u1ed9 ch\u1eadm, sau \u0111\u00f3 nghe t\u1ed1c \u0111\u1ed9 t\u1ef1 nhi\u00ean v\u00e0 ch\u1ecdn c\u00e2u b\u1ea1n v\u1eeba nghe.",
+        slowLabel = "Nghe ch\u1eadm",
+        naturalLabel = "Nghe t\u1ef1 nhi\u00ean",
+        chooseLabel = "B\u1ea1n \u0111\u00e3 nghe c\u00e2u n\u00e0o?",
+        correctLabel = "\u0110\u00fang r\u1ed3i! B\u1ea1n \u0111\u00e3 nh\u1eadn ra c\u00e2u.",
+        retryLabel = "Ch\u01b0a \u0111\u00fang. H\u00e3y nghe l\u1ea1i.",
+        completedLabel = "\u0110\u00e3 ho\u00e0n th\u00e0nh nghe",
+        unavailableLabel = "Thi\u1ebft b\u1ecb ch\u01b0a c\u00f3 gi\u1ecdng ti\u1ebfng H\u00e0n. H\u00e3y c\u00e0i gi\u1ecdng ti\u1ebfng H\u00e0n ngo\u1ea1i tuy\u1ebfn \u0111\u1ec3 d\u00f9ng \u00e2m thanh.",
+        continueLabel = "Ti\u1ebfp t\u1ee5c sang n\u00f3i",
     )
 
     "th" -> ListeningUiText(
-        title = "ฟังภาษาเกาหลีที่ใช้จริง",
-        intro = "ฟังก่อนโดยไม่ดูคำตอบ เริ่มจากความเร็วช้า แล้วฟังความเร็วธรรมชาติ จากนั้นเลือกประโยคที่ได้ยิน",
-        slowLabel = "ฟังแบบช้า",
-        naturalLabel = "ฟังแบบธรรมชาติ",
-        chooseLabel = "คุณได้ยินประโยคไหน?",
-        correctLabel = "ถูกต้อง! คุณฟังออกแล้ว",
-        retryLabel = "ยังไม่ถูก ลองฟังอีกครั้ง",
-        completedLabel = "ฝึกฟังแล้ว",
-        unavailableLabel = "อุปกรณ์นี้ยังไม่มีเสียงภาษาเกาหลี โปรดติดตั้งเสียงภาษาเกาหลีแบบออฟไลน์เพื่อใช้เสียง",
-        continueLabel = "ไปฝึกพูด",
+        title = "\u0e1f\u0e31\u0e07\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e08\u0e23\u0e34\u0e07",
+        intro = "\u0e1f\u0e31\u0e07\u0e01\u0e48\u0e2d\u0e19\u0e42\u0e14\u0e22\u0e44\u0e21\u0e48\u0e14\u0e39\u0e04\u0e33\u0e15\u0e2d\u0e1a \u0e40\u0e23\u0e34\u0e48\u0e21\u0e08\u0e32\u0e01\u0e04\u0e27\u0e32\u0e21\u0e40\u0e23\u0e47\u0e27\u0e0a\u0e49\u0e32 \u0e41\u0e25\u0e49\u0e27\u0e1f\u0e31\u0e07\u0e04\u0e27\u0e32\u0e21\u0e40\u0e23\u0e47\u0e27\u0e18\u0e23\u0e23\u0e21\u0e0a\u0e32\u0e15\u0e34 \u0e08\u0e32\u0e01\u0e19\u0e31\u0e49\u0e19\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e17\u0e35\u0e48\u0e44\u0e14\u0e49\u0e22\u0e34\u0e19",
+        slowLabel = "\u0e1f\u0e31\u0e07\u0e41\u0e1a\u0e1a\u0e0a\u0e49\u0e32",
+        naturalLabel = "\u0e1f\u0e31\u0e07\u0e41\u0e1a\u0e1a\u0e18\u0e23\u0e23\u0e21\u0e0a\u0e32\u0e15\u0e34",
+        chooseLabel = "\u0e04\u0e38\u0e13\u0e44\u0e14\u0e49\u0e22\u0e34\u0e19\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e44\u0e2b\u0e19?",
+        correctLabel = "\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07! \u0e04\u0e38\u0e13\u0e1f\u0e31\u0e07\u0e2d\u0e2d\u0e01\u0e41\u0e25\u0e49\u0e27",
+        retryLabel = "\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01 \u0e25\u0e2d\u0e07\u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07",
+        completedLabel = "\u0e1d\u0e36\u0e01\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27",
+        unavailableLabel = "\u0e2d\u0e38\u0e1b\u0e01\u0e23\u0e13\u0e4c\u0e19\u0e35\u0e49\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35 \u0e42\u0e1b\u0e23\u0e14\u0e15\u0e34\u0e14\u0e15\u0e31\u0e49\u0e07\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e41\u0e1a\u0e1a\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e43\u0e0a\u0e49\u0e40\u0e2a\u0e35\u0e22\u0e07",
+        continueLabel = "\u0e44\u0e1b\u0e1d\u0e36\u0e01\u0e1e\u0e39\u0e14",
     )
 
     "id" -> ListeningUiText(

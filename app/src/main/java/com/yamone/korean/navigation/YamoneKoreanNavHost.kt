@@ -41,6 +41,7 @@ fun YamoneKoreanNavHost(
 ) {
     val scope = rememberCoroutineScope()
     var requestedTraceLessonId by rememberSaveable { mutableStateOf<String?>(null) }
+    var guidedSentenceId by rememberSaveable { mutableStateOf<String?>(null) }
     val startDestination = when {
         initialLanguageCode == null -> AppDestination.Language.route
         learningProgress.currentStageRoute == AppDestination.Trace.route &&
@@ -83,6 +84,13 @@ fun YamoneKoreanNavHost(
                         if (destination == AppDestination.Trace) {
                             requestedTraceLessonId = null
                         }
+                        if (
+                            destination == AppDestination.Sentence ||
+                            destination == AppDestination.Listening ||
+                            destination == AppDestination.Speaking
+                        ) {
+                            guidedSentenceId = null
+                        }
                         onStageOpened(destination.route)
                         navController.navigate(destination.route)
                     }
@@ -99,6 +107,9 @@ fun YamoneKoreanNavHost(
                 val onNext: (() -> Unit)? = nextDestination?.let { next ->
                     {
                         scope.launch {
+                            if (destination == AppDestination.Speaking) {
+                                guidedSentenceId = null
+                            }
                             onStageOpened(next.route)
                             navController.navigate(next.route)
                         }
@@ -168,6 +179,14 @@ fun YamoneKoreanNavHost(
                                     onLessonCompleted(lessonId)
                                 }
                             },
+                            onStartGuidedPractice = { sentenceId ->
+                                guidedSentenceId = sentenceId
+                                scope.launch {
+                                    onStageOpened(AppDestination.Sentence.route)
+                                    onLessonOpened(AppDestination.Sentence.route, sentenceId)
+                                    navController.navigate(AppDestination.Sentence.route)
+                                }
+                            },
                             onContinue = onNext ?: {},
                         )
                     }
@@ -176,6 +195,7 @@ fun YamoneKoreanNavHost(
                         SentenceScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            focusLessonId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Sentence.route, lessonId)
@@ -199,6 +219,7 @@ fun YamoneKoreanNavHost(
                         ListeningScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            focusSentenceId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Listening.route, lessonId)
@@ -222,6 +243,7 @@ fun YamoneKoreanNavHost(
                         SpeakingScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            focusSentenceId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
                                     onLessonOpened(AppDestination.Speaking.route, lessonId)

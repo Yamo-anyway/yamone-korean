@@ -42,12 +42,22 @@ private data class SentenceUiText(
 fun SentenceScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
     onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val ui = sentenceUiText(languageCode)
+    val orderedLessons = remember(focusLessonId) {
+        if (focusLessonId == null) {
+            BasicSentenceCatalog.lessons
+        } else {
+            BasicSentenceCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == focusLessonId) 0 else 1
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -68,7 +78,7 @@ fun SentenceScreen(
         }
 
         items(
-            items = BasicSentenceCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             SentenceLessonCard(
@@ -167,7 +177,7 @@ private fun SentenceLessonCard(
 
             Text(
                 text = "${ui.selectedLabel}: " +
-                    selectedChunks.joinToString(" ").ifBlank { "—" },
+                    selectedChunks.joinToString(" ").ifBlank { "\u2014" },
                 style = MaterialTheme.typography.bodyLarge,
             )
 
@@ -212,62 +222,62 @@ private fun SentenceLessonCard(
 private fun sentenceUiText(languageCode: String?): SentenceUiText = when (languageCode) {
     "es" -> SentenceUiText(
         title = "Primeras frases en coreano",
-        intro = "Aprende el orden real de las palabras y luego reconstruye cada frase. En coreano, la acción suele ir al final.",
-        patternLabel = "Patrón",
+        intro = "Aprende el orden real de las palabras y luego reconstruye cada frase. En coreano, la acci\u00f3n suele ir al final.",
+        patternLabel = "Patr\u00f3n",
         meaningLabel = "Significado",
-        noteLabel = "Cómo funciona",
+        noteLabel = "C\u00f3mo funciona",
         buildLabel = "Construye la frase en orden",
         selectedLabel = "Tu frase",
         resetLabel = "Reiniciar",
-        correctLabel = "¡Correcto! Ya puedes usar este patrón.",
-        retryLabel = "El orden aún no es correcto. Inténtalo de nuevo.",
-        completedLabel = "Patrón aprendido",
+        correctLabel = "\u00a1Correcto! Ya puedes usar este patr\u00f3n.",
+        retryLabel = "El orden a\u00fan no es correcto. Int\u00e9ntalo de nuevo.",
+        completedLabel = "Patr\u00f3n aprendido",
         continueLabel = "Continuar a escucha",
     )
 
     "fr" -> SentenceUiText(
-        title = "Premières phrases en coréen",
-        intro = "Apprends l'ordre réel des mots puis reconstruis chaque phrase. En coréen, l'action se place généralement à la fin.",
-        patternLabel = "Modèle",
+        title = "Premi\u00e8res phrases en cor\u00e9en",
+        intro = "Apprends l'ordre r\u00e9el des mots puis reconstruis chaque phrase. En cor\u00e9en, l'action se place g\u00e9n\u00e9ralement \u00e0 la fin.",
+        patternLabel = "Mod\u00e8le",
         meaningLabel = "Sens",
         noteLabel = "Fonctionnement",
         buildLabel = "Reconstruis la phrase dans l'ordre",
         selectedLabel = "Ta phrase",
         resetLabel = "Recommencer",
-        correctLabel = "Correct ! Tu peux réutiliser ce modèle.",
-        retryLabel = "L'ordre n'est pas encore correct. Réessaie.",
-        completedLabel = "Modèle appris",
-        continueLabel = "Continuer vers l'écoute",
+        correctLabel = "Correct ! Tu peux r\u00e9utiliser ce mod\u00e8le.",
+        retryLabel = "L'ordre n'est pas encore correct. R\u00e9essaie.",
+        completedLabel = "Mod\u00e8le appris",
+        continueLabel = "Continuer vers l'\u00e9coute",
     )
 
     "vi" -> SentenceUiText(
-        title = "Những câu tiếng Hàn đầu tiên",
-        intro = "Học trật tự từ thực tế rồi tự ghép lại từng câu. Trong tiếng Hàn, động từ thường đứng cuối.",
-        patternLabel = "Mẫu câu",
-        meaningLabel = "Nghĩa",
-        noteLabel = "Cách dùng",
-        buildLabel = "Ghép câu theo đúng thứ tự",
-        selectedLabel = "Câu của bạn",
-        resetLabel = "Làm lại",
-        correctLabel = "Đúng rồi! Bạn có thể dùng lại mẫu câu này.",
-        retryLabel = "Thứ tự chưa đúng. Hãy thử lại.",
-        completedLabel = "Đã học mẫu câu",
-        continueLabel = "Tiếp tục sang nghe",
+        title = "Nh\u1eefng c\u00e2u ti\u1ebfng H\u00e0n \u0111\u1ea7u ti\u00ean",
+        intro = "H\u1ecdc tr\u1eadt t\u1ef1 t\u1eeb th\u1ef1c t\u1ebf r\u1ed3i t\u1ef1 gh\u00e9p l\u1ea1i t\u1eebng c\u00e2u. Trong ti\u1ebfng H\u00e0n, \u0111\u1ed9ng t\u1eeb th\u01b0\u1eddng \u0111\u1ee9ng cu\u1ed1i.",
+        patternLabel = "M\u1eabu c\u00e2u",
+        meaningLabel = "Ngh\u0129a",
+        noteLabel = "C\u00e1ch d\u00f9ng",
+        buildLabel = "Gh\u00e9p c\u00e2u theo \u0111\u00fang th\u1ee9 t\u1ef1",
+        selectedLabel = "C\u00e2u c\u1ee7a b\u1ea1n",
+        resetLabel = "L\u00e0m l\u1ea1i",
+        correctLabel = "\u0110\u00fang r\u1ed3i! B\u1ea1n c\u00f3 th\u1ec3 d\u00f9ng l\u1ea1i m\u1eabu c\u00e2u n\u00e0y.",
+        retryLabel = "Th\u1ee9 t\u1ef1 ch\u01b0a \u0111\u00fang. H\u00e3y th\u1eed l\u1ea1i.",
+        completedLabel = "\u0110\u00e3 h\u1ecdc m\u1eabu c\u00e2u",
+        continueLabel = "Ti\u1ebfp t\u1ee5c sang nghe",
     )
 
     "th" -> SentenceUiText(
-        title = "ประโยคภาษาเกาหลีชุดแรก",
-        intro = "เรียนรู้ลำดับคำที่ใช้จริง แล้วเรียงประโยคด้วยตัวเอง ภาษาเกาหลีมักวางคำกริยาไว้ท้ายประโยค",
-        patternLabel = "รูปแบบ",
-        meaningLabel = "ความหมาย",
-        noteLabel = "วิธีใช้",
-        buildLabel = "เรียงประโยคให้ถูกต้อง",
-        selectedLabel = "ประโยคของคุณ",
-        resetLabel = "เริ่มใหม่",
-        correctLabel = "ถูกต้อง! ใช้รูปแบบนี้สร้างประโยคใหม่ได้แล้ว",
-        retryLabel = "ลำดับยังไม่ถูก ลองอีกครั้ง",
-        completedLabel = "เรียนรูปแบบนี้แล้ว",
-        continueLabel = "ไปฝึกฟัง",
+        title = "\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e0a\u0e38\u0e14\u0e41\u0e23\u0e01",
+        intro = "\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e25\u0e33\u0e14\u0e31\u0e1a\u0e04\u0e33\u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e08\u0e23\u0e34\u0e07 \u0e41\u0e25\u0e49\u0e27\u0e40\u0e23\u0e35\u0e22\u0e07\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e14\u0e49\u0e27\u0e22\u0e15\u0e31\u0e27\u0e40\u0e2d\u0e07 \u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e21\u0e31\u0e01\u0e27\u0e32\u0e07\u0e04\u0e33\u0e01\u0e23\u0e34\u0e22\u0e32\u0e44\u0e27\u0e49\u0e17\u0e49\u0e32\u0e22\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04",
+        patternLabel = "\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a",
+        meaningLabel = "\u0e04\u0e27\u0e32\u0e21\u0e2b\u0e21\u0e32\u0e22",
+        noteLabel = "\u0e27\u0e34\u0e18\u0e35\u0e43\u0e0a\u0e49",
+        buildLabel = "\u0e40\u0e23\u0e35\u0e22\u0e07\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e43\u0e2b\u0e49\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07",
+        selectedLabel = "\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13",
+        resetLabel = "\u0e40\u0e23\u0e34\u0e48\u0e21\u0e43\u0e2b\u0e21\u0e48",
+        correctLabel = "\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07! \u0e43\u0e0a\u0e49\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a\u0e19\u0e35\u0e49\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e43\u0e2b\u0e21\u0e48\u0e44\u0e14\u0e49\u0e41\u0e25\u0e49\u0e27",
+        retryLabel = "\u0e25\u0e33\u0e14\u0e31\u0e1a\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01 \u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07",
+        completedLabel = "\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a\u0e19\u0e35\u0e49\u0e41\u0e25\u0e49\u0e27",
+        continueLabel = "\u0e44\u0e1b\u0e1d\u0e36\u0e01\u0e1f\u0e31\u0e07",
     )
 
     "id" -> SentenceUiText(

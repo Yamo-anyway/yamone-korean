@@ -55,6 +55,7 @@ private data class SpeakingAttempt(
 fun SpeakingScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    focusSentenceId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
     onLessonNeedsReview: (String) -> Unit,
@@ -62,6 +63,15 @@ fun SpeakingScreen(
 ) {
     val context = LocalContext.current
     val ui = speakingUiText(languageCode)
+    val orderedLessons = remember(focusSentenceId) {
+        if (focusSentenceId == null) {
+            BasicSentenceCatalog.lessons
+        } else {
+            BasicSentenceCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == focusSentenceId) 0 else 1
+            }
+        }
+    }
     val onDeviceRecognitionAvailable = remember(context) {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
@@ -177,7 +187,7 @@ fun SpeakingScreen(
         }
 
         items(
-            items = BasicSentenceCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             val speakingId = "speaking_${lesson.id}"
@@ -306,58 +316,58 @@ private fun levenshteinDistance(left: String, right: String): Int {
 private fun speakingUiText(languageCode: String?): SpeakingUiText = when (languageCode) {
     "es" -> SpeakingUiText(
         title = "Habla coreano",
-        intro = "Lee una frase útil, dilo en voz alta y compara lo que reconoció el dispositivo. La comprobación usa reconocimiento de voz coreano sin conexión cuando está disponible.",
+        intro = "Lee una frase \u00fatil, dilo en voz alta y compara lo que reconoci\u00f3 el dispositivo. La comprobaci\u00f3n usa reconocimiento de voz coreano sin conexi\u00f3n cuando est\u00e1 disponible.",
         targetLabel = "Di esta frase",
         speakLabel = "Hablar",
         recognizedLabel = "Reconocido",
-        matchedLabel = "¡Muy bien! La frase coincide.",
-        retryLabel = "Casi. Inténtalo otra vez.",
-        completedLabel = "Práctica oral completada",
-        unavailableLabel = "El reconocimiento de voz coreano sin conexión no está disponible en este dispositivo. Puedes seguir estudiando, pero la comprobación por voz queda desactivada.",
-        canceledLabel = "La escucha se canceló. Inténtalo otra vez cuando quieras.",
-        continueLabel = "Continuar a conversación",
+        matchedLabel = "\u00a1Muy bien! La frase coincide.",
+        retryLabel = "Casi. Int\u00e9ntalo otra vez.",
+        completedLabel = "Pr\u00e1ctica oral completada",
+        unavailableLabel = "El reconocimiento de voz coreano sin conexi\u00f3n no est\u00e1 disponible en este dispositivo. Puedes seguir estudiando, pero la comprobaci\u00f3n por voz queda desactivada.",
+        canceledLabel = "La escucha se cancel\u00f3. Int\u00e9ntalo otra vez cuando quieras.",
+        continueLabel = "Continuar a conversaci\u00f3n",
     )
 
     "fr" -> SpeakingUiText(
-        title = "Parler coréen",
-        intro = "Lis une phrase utile, dis-la à voix haute et compare ce que l'appareil a reconnu. La vérification utilise la reconnaissance vocale coréenne hors ligne lorsqu'elle est disponible.",
+        title = "Parler cor\u00e9en",
+        intro = "Lis une phrase utile, dis-la \u00e0 voix haute et compare ce que l'appareil a reconnu. La v\u00e9rification utilise la reconnaissance vocale cor\u00e9enne hors ligne lorsqu'elle est disponible.",
         targetLabel = "Dis cette phrase",
         speakLabel = "Parler",
         recognizedLabel = "Reconnu",
-        matchedLabel = "Très bien ! La phrase correspond.",
-        retryLabel = "Presque. Réessaie.",
-        completedLabel = "Expression orale terminée",
-        unavailableLabel = "La reconnaissance vocale coréenne hors ligne n'est pas disponible sur cet appareil. Tu peux continuer à apprendre, mais la vérification vocale est désactivée.",
-        canceledLabel = "L'écoute a été annulée. Réessaie quand tu veux.",
+        matchedLabel = "Tr\u00e8s bien ! La phrase correspond.",
+        retryLabel = "Presque. R\u00e9essaie.",
+        completedLabel = "Expression orale termin\u00e9e",
+        unavailableLabel = "La reconnaissance vocale cor\u00e9enne hors ligne n'est pas disponible sur cet appareil. Tu peux continuer \u00e0 apprendre, mais la v\u00e9rification vocale est d\u00e9sactiv\u00e9e.",
+        canceledLabel = "L'\u00e9coute a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie quand tu veux.",
         continueLabel = "Continuer vers la conversation",
     )
 
     "vi" -> SpeakingUiText(
-        title = "Nói tiếng Hàn",
-        intro = "Xem một câu hữu ích, nói thành tiếng rồi so sánh với kết quả thiết bị nhận dạng. Ứng dụng ưu tiên nhận dạng giọng nói tiếng Hàn ngoại tuyến trên thiết bị.",
-        targetLabel = "Hãy nói câu này",
-        speakLabel = "Nói",
-        recognizedLabel = "Đã nhận dạng",
-        matchedLabel = "Rất tốt! Câu nói khớp.",
-        retryLabel = "Gần đúng rồi. Hãy thử lại.",
-        completedLabel = "Đã hoàn thành luyện nói",
-        unavailableLabel = "Thiết bị này không có nhận dạng giọng nói tiếng Hàn ngoại tuyến. Bạn vẫn có thể học tiếp nhưng chức năng kiểm tra giọng nói sẽ bị tắt.",
-        canceledLabel = "Đã hủy nghe. Bạn có thể thử lại bất cứ lúc nào.",
-        continueLabel = "Tiếp tục sang hội thoại",
+        title = "N\u00f3i ti\u1ebfng H\u00e0n",
+        intro = "Xem m\u1ed9t c\u00e2u h\u1eefu \u00edch, n\u00f3i th\u00e0nh ti\u1ebfng r\u1ed3i so s\u00e1nh v\u1edbi k\u1ebft qu\u1ea3 thi\u1ebft b\u1ecb nh\u1eadn d\u1ea1ng. \u1ee8ng d\u1ee5ng \u01b0u ti\u00ean nh\u1eadn d\u1ea1ng gi\u1ecdng n\u00f3i ti\u1ebfng H\u00e0n ngo\u1ea1i tuy\u1ebfn tr\u00ean thi\u1ebft b\u1ecb.",
+        targetLabel = "H\u00e3y n\u00f3i c\u00e2u n\u00e0y",
+        speakLabel = "N\u00f3i",
+        recognizedLabel = "\u0110\u00e3 nh\u1eadn d\u1ea1ng",
+        matchedLabel = "R\u1ea5t t\u1ed1t! C\u00e2u n\u00f3i kh\u1edbp.",
+        retryLabel = "G\u1ea7n \u0111\u00fang r\u1ed3i. H\u00e3y th\u1eed l\u1ea1i.",
+        completedLabel = "\u0110\u00e3 ho\u00e0n th\u00e0nh luy\u1ec7n n\u00f3i",
+        unavailableLabel = "Thi\u1ebft b\u1ecb n\u00e0y kh\u00f4ng c\u00f3 nh\u1eadn d\u1ea1ng gi\u1ecdng n\u00f3i ti\u1ebfng H\u00e0n ngo\u1ea1i tuy\u1ebfn. B\u1ea1n v\u1eabn c\u00f3 th\u1ec3 h\u1ecdc ti\u1ebfp nh\u01b0ng ch\u1ee9c n\u0103ng ki\u1ec3m tra gi\u1ecdng n\u00f3i s\u1ebd b\u1ecb t\u1eaft.",
+        canceledLabel = "\u0110\u00e3 h\u1ee7y nghe. B\u1ea1n c\u00f3 th\u1ec3 th\u1eed l\u1ea1i b\u1ea5t c\u1ee9 l\u00fac n\u00e0o.",
+        continueLabel = "Ti\u1ebfp t\u1ee5c sang h\u1ed9i tho\u1ea1i",
     )
 
     "th" -> SpeakingUiText(
-        title = "พูดภาษาเกาหลี",
-        intro = "ดูประโยคที่ใช้จริง พูดออกเสียง แล้วเปรียบเทียบกับข้อความที่อุปกรณ์ฟังได้ โดยให้ความสำคัญกับการรู้จำเสียงภาษาเกาหลีแบบออฟไลน์บนอุปกรณ์",
-        targetLabel = "พูดประโยคนี้",
-        speakLabel = "พูด",
-        recognizedLabel = "ฟังได้ว่า",
-        matchedLabel = "ดีมาก! ประโยคตรงกัน",
-        retryLabel = "เกือบแล้ว ลองอีกครั้ง",
-        completedLabel = "ฝึกพูดเสร็จแล้ว",
-        unavailableLabel = "อุปกรณ์นี้ไม่มีการรู้จำเสียงภาษาเกาหลีแบบออฟไลน์ คุณยังเรียนต่อได้ แต่การตรวจเสียงจะถูกปิด",
-        canceledLabel = "ยกเลิกการฟังแล้ว ลองใหม่ได้ทุกเมื่อ",
-        continueLabel = "ไปฝึกสนทนา",
+        title = "\u0e1e\u0e39\u0e14\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35",
+        intro = "\u0e14\u0e39\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e08\u0e23\u0e34\u0e07 \u0e1e\u0e39\u0e14\u0e2d\u0e2d\u0e01\u0e40\u0e2a\u0e35\u0e22\u0e07 \u0e41\u0e25\u0e49\u0e27\u0e40\u0e1b\u0e23\u0e35\u0e22\u0e1a\u0e40\u0e17\u0e35\u0e22\u0e1a\u0e01\u0e31\u0e1a\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e17\u0e35\u0e48\u0e2d\u0e38\u0e1b\u0e01\u0e23\u0e13\u0e4c\u0e1f\u0e31\u0e07\u0e44\u0e14\u0e49 \u0e42\u0e14\u0e22\u0e43\u0e2b\u0e49\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e04\u0e31\u0e0d\u0e01\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e23\u0e39\u0e49\u0e08\u0e33\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e41\u0e1a\u0e1a\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c\u0e1a\u0e19\u0e2d\u0e38\u0e1b\u0e01\u0e23\u0e13\u0e4c",
+        targetLabel = "\u0e1e\u0e39\u0e14\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e19\u0e35\u0e49",
+        speakLabel = "\u0e1e\u0e39\u0e14",
+        recognizedLabel = "\u0e1f\u0e31\u0e07\u0e44\u0e14\u0e49\u0e27\u0e48\u0e32",
+        matchedLabel = "\u0e14\u0e35\u0e21\u0e32\u0e01! \u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19",
+        retryLabel = "\u0e40\u0e01\u0e37\u0e2d\u0e1a\u0e41\u0e25\u0e49\u0e27 \u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07",
+        completedLabel = "\u0e1d\u0e36\u0e01\u0e1e\u0e39\u0e14\u0e40\u0e2a\u0e23\u0e47\u0e08\u0e41\u0e25\u0e49\u0e27",
+        unavailableLabel = "\u0e2d\u0e38\u0e1b\u0e01\u0e23\u0e13\u0e4c\u0e19\u0e35\u0e49\u0e44\u0e21\u0e48\u0e21\u0e35\u0e01\u0e32\u0e23\u0e23\u0e39\u0e49\u0e08\u0e33\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e20\u0e32\u0e29\u0e32\u0e40\u0e01\u0e32\u0e2b\u0e25\u0e35\u0e41\u0e1a\u0e1a\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c \u0e04\u0e38\u0e13\u0e22\u0e31\u0e07\u0e40\u0e23\u0e35\u0e22\u0e19\u0e15\u0e48\u0e2d\u0e44\u0e14\u0e49 \u0e41\u0e15\u0e48\u0e01\u0e32\u0e23\u0e15\u0e23\u0e27\u0e08\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e08\u0e30\u0e16\u0e39\u0e01\u0e1b\u0e34\u0e14",
+        canceledLabel = "\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27 \u0e25\u0e2d\u0e07\u0e43\u0e2b\u0e21\u0e48\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e40\u0e21\u0e37\u0e48\u0e2d",
+        continueLabel = "\u0e44\u0e1b\u0e1d\u0e36\u0e01\u0e2a\u0e19\u0e17\u0e19\u0e32",
     )
 
     "id" -> SpeakingUiText(
