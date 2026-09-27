@@ -11,5 +11,12 @@ data class GuidedPracticePack(
 }
 
 object GuidedPracticeCatalog {
-    val packs: List<GuidedPracticePack> = listOf()
+    val packs: List<GuidedPracticePack> = listOf(
+        GuidedPracticePack(
+            id = "cafe",
+            sentenceId = "sentence_order_one",
+            wordIds = listOf("word_bibimbap"),
+            titles = mapOf("en" to "Cafe practice"),
+        ),
+    )
 }
