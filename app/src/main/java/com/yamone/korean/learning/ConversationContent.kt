@@ -23,7 +23,10 @@ data class ConversationLesson(
 }
 
 object ConversationCatalog {
-    val lessons = listOf(
+    val lessons: List<ConversationLesson>
+        get() = baseLessons + FollowUpConversationCatalog.lessons
+
+    private val baseLessons = listOf(
         ConversationLesson(
             id = "cafe_order",
             situation = tr(
