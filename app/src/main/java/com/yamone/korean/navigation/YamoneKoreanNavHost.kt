@@ -282,6 +282,7 @@ fun YamoneKoreanNavHost(
                         SelfExpressionScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
                             focusLessonId = reviewFocusLessonId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
@@ -306,6 +307,7 @@ fun YamoneKoreanNavHost(
                         ConversationScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
                             focusLessonId = reviewFocusLessonId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {

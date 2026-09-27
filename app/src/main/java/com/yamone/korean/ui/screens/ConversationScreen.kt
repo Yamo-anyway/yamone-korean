@@ -68,6 +68,7 @@ private data class ConversationAttempt(
 fun ConversationScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    reviewLessonIds: Set<String>,
     focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
@@ -76,13 +77,24 @@ fun ConversationScreen(
 ) {
     val context = LocalContext.current
     val ui = conversationUiText(languageCode)
-    val orderedLessons = remember(focusLessonId) {
-        if (focusLessonId == null) {
-            ConversationCatalog.lessons
-        } else {
+    val orderedLessons = remember(focusLessonId, completedLessonIds, reviewLessonIds) {
+        if (focusLessonId != null) {
             ConversationCatalog.lessons.sortedBy { lesson ->
                 if (lesson.id == focusLessonId) 0 else 1
             }
+        } else {
+            val reviewLessons = ConversationCatalog.lessons.filter { lesson ->
+                "conversation_${lesson.id}" in reviewLessonIds
+            }
+            val incompleteLessons = ConversationCatalog.lessons.filter { lesson ->
+                val lessonId = "conversation_${lesson.id}"
+                lessonId !in reviewLessonIds && lessonId !in completedLessonIds
+            }
+            val completedLessons = ConversationCatalog.lessons.filter { lesson ->
+                val lessonId = "conversation_${lesson.id}"
+                lessonId !in reviewLessonIds && lessonId in completedLessonIds
+            }
+            reviewLessons + incompleteLessons + completedLessons
         }
     }
     val speechAvailable = remember(context) {

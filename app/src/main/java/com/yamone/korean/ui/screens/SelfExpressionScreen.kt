@@ -62,6 +62,7 @@ private data class ExpressionAttempt(
 fun SelfExpressionScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    reviewLessonIds: Set<String>,
     focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
@@ -70,13 +71,24 @@ fun SelfExpressionScreen(
 ) {
     val context = LocalContext.current
     val ui = expressionUiText(languageCode)
-    val orderedLessons = remember(focusLessonId) {
-        if (focusLessonId == null) {
-            SelfExpressionCatalog.lessons
-        } else {
+    val orderedLessons = remember(focusLessonId, completedLessonIds, reviewLessonIds) {
+        if (focusLessonId != null) {
             SelfExpressionCatalog.lessons.sortedBy { lesson ->
                 if (lesson.id == focusLessonId) 0 else 1
             }
+        } else {
+            val reviewLessons = SelfExpressionCatalog.lessons.filter { lesson ->
+                "expression_${lesson.id}" in reviewLessonIds
+            }
+            val incompleteLessons = SelfExpressionCatalog.lessons.filter { lesson ->
+                val lessonId = "expression_${lesson.id}"
+                lessonId !in reviewLessonIds && lessonId !in completedLessonIds
+            }
+            val completedLessons = SelfExpressionCatalog.lessons.filter { lesson ->
+                val lessonId = "expression_${lesson.id}"
+                lessonId !in reviewLessonIds && lessonId in completedLessonIds
+            }
+            reviewLessons + incompleteLessons + completedLessons
         }
     }
     val onDeviceRecognitionAvailable = remember(context) {
