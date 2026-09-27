@@ -55,6 +55,7 @@ private data class SpeakingAttempt(
 fun SpeakingScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    reviewLessonIds: Set<String>,
     focusSentenceId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
@@ -63,8 +64,11 @@ fun SpeakingScreen(
 ) {
     val context = LocalContext.current
     val ui = speakingUiText(languageCode)
-    val entrySentenceId = remember(focusSentenceId) {
+    val entrySentenceId = remember(focusSentenceId, completedLessonIds, reviewLessonIds) {
         focusSentenceId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
+                "speaking_${lesson.id}" in reviewLessonIds
+            }?.id
             ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
                 "speaking_${lesson.id}" !in completedLessonIds
             }?.id

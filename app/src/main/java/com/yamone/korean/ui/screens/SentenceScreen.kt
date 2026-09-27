@@ -42,6 +42,7 @@ private data class SentenceUiText(
 fun SentenceScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    reviewLessonIds: Set<String>,
     focusLessonId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
@@ -49,8 +50,9 @@ fun SentenceScreen(
     onContinue: () -> Unit,
 ) {
     val ui = sentenceUiText(languageCode)
-    val entryLessonId = remember(focusLessonId) {
+    val entryLessonId = remember(focusLessonId, completedLessonIds, reviewLessonIds) {
         focusLessonId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { it.id in reviewLessonIds }?.id
             ?: BasicSentenceCatalog.lessons.firstOrNull { it.id !in completedLessonIds }?.id
     }
     val orderedLessons = remember(entryLessonId) {

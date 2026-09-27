@@ -210,6 +210,7 @@ fun YamoneKoreanNavHost(
                         SentenceScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
                             focusLessonId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
@@ -234,6 +235,7 @@ fun YamoneKoreanNavHost(
                         ListeningScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
                             focusSentenceId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {
@@ -258,6 +260,7 @@ fun YamoneKoreanNavHost(
                         SpeakingScreen(
                             languageCode = initialLanguageCode,
                             completedLessonIds = learningProgress.completedLessonIds,
+                            reviewLessonIds = learningProgress.reviewLessonIds,
                             focusSentenceId = guidedSentenceId,
                             onLessonOpened = { lessonId ->
                                 scope.launch {

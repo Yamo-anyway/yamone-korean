@@ -43,6 +43,7 @@ private data class ListeningUiText(
 fun ListeningScreen(
     languageCode: String?,
     completedLessonIds: Set<String>,
+    reviewLessonIds: Set<String>,
     focusSentenceId: String? = null,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
@@ -51,8 +52,11 @@ fun ListeningScreen(
 ) {
     val context = LocalContext.current
     val ui = listeningUiText(languageCode)
-    val entrySentenceId = remember(focusSentenceId) {
+    val entrySentenceId = remember(focusSentenceId, completedLessonIds, reviewLessonIds) {
         focusSentenceId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
+                "listening_${lesson.id}" in reviewLessonIds
+            }?.id
             ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
                 "listening_${lesson.id}" !in completedLessonIds
             }?.id
