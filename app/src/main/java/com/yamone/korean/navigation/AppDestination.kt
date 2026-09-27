@@ -9,7 +9,7 @@ enum class AppDestination(
     Jamo("jamo", "Hangul letters"),
     Trace("trace", "Touch writing"),
     Write("write", "Free writing"),
-    Syllable("syllable", "Syllables"),
+    Syllable("syllable", "Syllables & final consonants"),
     Word("word", "Words"),
     Sentence("sentence", "Sentences"),
     Listening("listening", "Listening"),
@@ -23,7 +23,6 @@ enum class AppDestination(
 val learningDestinations = listOf(
     AppDestination.Jamo,
     AppDestination.Trace,
-    AppDestination.Write,
     AppDestination.Syllable,
     AppDestination.Word,
     AppDestination.Sentence,

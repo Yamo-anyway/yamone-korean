@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.yamone.korean.data.LearningProgressState
 import com.yamone.korean.navigation.AppDestination
 import com.yamone.korean.navigation.learningDestinations
 
@@ -74,9 +75,14 @@ fun LanguageSelectionScreen(
 
 @Composable
 fun HomeScreen(
+    learningProgress: LearningProgressState,
     onOpenDestination: (AppDestination) -> Unit,
     onOpenSettings: () -> Unit,
 ) {
+    val resumeDestination = learningDestinations.firstOrNull {
+        it.route == learningProgress.currentStageRoute
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -90,9 +96,19 @@ fun HomeScreen(
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
-                text = "Quick Hangul → words → sentences → listening → speaking → my expressions → conversation",
+                text = "Quick Hangul → syllables & final consonants → words → sentences → listening → speaking → real conversation",
                 style = MaterialTheme.typography.bodyMedium,
             )
+            if (resumeDestination != null) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp),
+                    onClick = { onOpenDestination(resumeDestination) },
+                ) {
+                    Text("Continue: ${resumeDestination.title}")
+                }
+            }
         }
 
         items(learningDestinations) { destination ->
@@ -191,9 +207,9 @@ fun SettingsScreen(
 
 private fun stageDescription(destination: AppDestination): String = when (destination) {
     AppDestination.Jamo -> "Recognize Korean consonants and vowels and connect each shape with its sound."
-    AppDestination.Trace -> "Follow animated stroke order and trace each letter with your finger."
+    AppDestination.Trace -> "Do a short writing pass to learn the shapes, then move on quickly to reading."
     AppDestination.Write -> "Write letters and syllables without tracing guides."
-    AppDestination.Syllable -> "Combine initial consonants, vowels and final consonants into Hangul blocks."
+    AppDestination.Syllable -> "Read syllables and final consonants so you can move into real Korean words."
     AppDestination.Word -> "Read and write high-frequency Korean words."
     AppDestination.Sentence -> "Build and understand short everyday Korean sentences."
     AppDestination.Listening -> "Listen at slow and natural speed and identify what was said."

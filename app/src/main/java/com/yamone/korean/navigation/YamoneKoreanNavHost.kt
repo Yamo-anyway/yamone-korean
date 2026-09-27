@@ -80,6 +80,7 @@ fun YamoneKoreanNavHost(
 
         composable(AppDestination.Home.route) {
             HomeScreen(
+                learningProgress = learningProgress,
                 onOpenDestination = { destination ->
                     scope.launch {
                         if (destination == AppDestination.Trace) {
