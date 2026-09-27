@@ -396,6 +396,71 @@ object ConversationCatalog {
                 "ลงหลังจากสองป้าย",
                 "Turun setelah dua pemberhentian.",
             ),
+        ),
+        ConversationLesson(
+            id = "clinic_symptom",
+            situation = tr("At a clinic", "En una clínica", "À la clinique", "Ở phòng khám", "ที่คลินิก", "Di klinik"),
+            partnerLine = "어디가 아프세요?",
+            partnerMeanings = tr("Where are you feeling pain?", "¿Dónde siente dolor?", "Où avez-vous mal ?", "Bạn đau ở đâu?", "เจ็บตรงไหนคะ/ครับ?", "Bagian mana yang sakit?"),
+            replies = listOf(
+                ConversationReply("headache", "머리가 아파요.", tr("My head hurts.", "Me duele la cabeza.", "J'ai mal à la tête.", "Tôi đau đầu.", "ปวดหัวค่ะ/ครับ", "Kepala saya sakit.")),
+                ConversationReply("stomachache", "배가 아파요.", tr("My stomach hurts.", "Me duele el estómago.", "J'ai mal au ventre.", "Tôi đau bụng.", "ปวดท้องค่ะ/ครับ", "Perut saya sakit.")),
+                ConversationReply("fever", "열이 있어요.", tr("I have a fever.", "Tengo fiebre.", "J'ai de la fièvre.", "Tôi bị sốt.", "มีไข้ค่ะ/ครับ", "Saya demam.")),
+            ),
+            closingLine = "알겠습니다. 잠시만 기다려 주세요.",
+            closingMeanings = tr("I understand. Please wait a moment.", "Entiendo. Espere un momento, por favor.", "D'accord. Veuillez patienter un moment.", "Tôi hiểu rồi. Vui lòng đợi một chút.", "เข้าใจแล้ว กรุณารอสักครู่", "Baik. Mohon tunggu sebentar."),
+        ),
+        ConversationLesson(
+            id = "hotel_checkin",
+            situation = tr("Checking in at a hotel", "Registrarse en un hotel", "Faire l'enregistrement à l'hôtel", "Nhận phòng khách sạn", "เช็กอินที่โรงแรม", "Check-in di hotel"),
+            partnerLine = "예약하셨어요?",
+            partnerMeanings = tr("Do you have a reservation?", "¿Tiene una reserva?", "Vous avez une réservation ?", "Bạn có đặt phòng không?", "จองไว้ไหมคะ/ครับ?", "Apakah Anda punya reservasi?"),
+            replies = listOf(
+                ConversationReply("reservation_yes", "네, 예약했어요.", tr("Yes, I made a reservation.", "Sí, hice una reserva.", "Oui, j'ai réservé.", "Vâng, tôi đã đặt phòng.", "ค่ะ/ครับ จองไว้แล้ว", "Ya, saya sudah reservasi.")),
+                ConversationReply("name", "제 이름은 마리아예요.", tr("My name is Maria.", "Me llamo María.", "Je m'appelle Maria.", "Tên tôi là Maria.", "ฉันชื่อมาเรีย", "Nama saya Maria.")),
+                ConversationReply("wifi", "와이파이 어떻게 연결해요?", tr("How do I connect to Wi-Fi?", "¿Cómo me conecto al Wi-Fi?", "Comment se connecter au Wi-Fi ?", "Kết nối Wi-Fi như thế nào?", "เชื่อมต่อไวไฟอย่างไร?", "Bagaimana cara terhubung ke Wi-Fi?")),
+            ),
+            closingLine = "네, 확인됐습니다. 여기 키가 있습니다.",
+            closingMeanings = tr("Yes, it's confirmed. Here is your key.", "Sí, está confirmado. Aquí tiene su llave.", "Oui, c'est confirmé. Voici votre clé.", "Vâng, đã xác nhận. Đây là chìa khóa của bạn.", "ยืนยันแล้วค่ะ/ครับ นี่คือกุญแจ", "Ya, sudah dikonfirmasi. Ini kunci Anda."),
+        ),
+        ConversationLesson(
+            id = "phone_call",
+            situation = tr("On the phone", "Por teléfono", "Au téléphone", "Nói chuyện điện thoại", "คุยโทรศัพท์", "Melalui telepon"),
+            partnerLine = "여보세요? 지금 통화 가능하세요?",
+            partnerMeanings = tr("Hello? Can you talk now?", "¿Hola? ¿Puede hablar ahora?", "Allô ? Vous pouvez parler maintenant ?", "A lô? Bây giờ bạn nói chuyện được không?", "ฮัลโหล ตอนนี้คุยได้ไหม?", "Halo? Bisa bicara sekarang?"),
+            replies = listOf(
+                ConversationReply("can_talk", "네, 괜찮아요.", tr("Yes, it's fine.", "Sí, está bien.", "Oui, ça va.", "Vâng, được.", "ได้ค่ะ/ครับ", "Ya, bisa.")),
+                ConversationReply("call_later", "지금 바빠요. 나중에 전화할게요.", tr("I'm busy now. I'll call later.", "Estoy ocupado ahora. Llamaré más tarde.", "Je suis occupé maintenant. Je rappellerai plus tard.", "Bây giờ tôi bận. Tôi sẽ gọi lại sau.", "ตอนนี้ยุ่งอยู่ เดี๋ยวโทรกลับนะ", "Saya sedang sibuk. Nanti saya telepon lagi.")),
+                ConversationReply("repeat", "다시 말해 주세요.", tr("Please say that again.", "Repítalo, por favor.", "Répétez, s'il vous plaît.", "Vui lòng nói lại.", "พูดอีกครั้งได้ไหม?", "Tolong ulangi.")),
+            ),
+            closingLine = "네, 알겠습니다. 다시 연락할게요.",
+            closingMeanings = tr("Okay, I understand. I'll contact you again.", "De acuerdo. Volveré a contactar.", "D'accord. Je vous recontacterai.", "Vâng, tôi hiểu rồi. Tôi sẽ liên lạc lại.", "เข้าใจแล้ว เดี๋ยวติดต่ออีกครั้ง", "Baik, saya mengerti. Nanti saya hubungi lagi."),
+        ),
+        ConversationLesson(
+            id = "make_plan",
+            situation = tr("Making plans with someone", "Hacer planes con alguien", "Faire des projets avec quelqu'un", "Hẹn gặp ai đó", "นัดหมาย", "Membuat janji"),
+            partnerLine = "내일 시간 있어요?",
+            partnerMeanings = tr("Do you have time tomorrow?", "¿Tiene tiempo mañana?", "Vous avez du temps demain ?", "Ngày mai bạn có thời gian không?", "พรุ่งนี้ว่างไหม?", "Besok ada waktu?"),
+            replies = listOf(
+                ConversationReply("free", "네, 오후에 시간 있어요.", tr("Yes, I'm free in the afternoon.", "Sí, tengo tiempo por la tarde.", "Oui, je suis libre l'après-midi.", "Vâng, buổi chiều tôi rảnh.", "ว่างตอนบ่ายค่ะ/ครับ", "Ya, saya ada waktu sore.")),
+                ConversationReply("busy", "내일은 바빠요.", tr("I'm busy tomorrow.", "Mañana estoy ocupado.", "Je suis occupé demain.", "Ngày mai tôi bận.", "พรุ่งนี้ยุ่งค่ะ/ครับ", "Besok saya sibuk.")),
+                ConversationReply("when", "몇 시에 만날까요?", tr("What time shall we meet?", "¿A qué hora nos vemos?", "À quelle heure on se retrouve ?", "Mấy giờ chúng ta gặp nhau?", "เจอกันกี่โมงดี?", "Kita bertemu jam berapa?")),
+            ),
+            closingLine = "그럼 3시에 만나요.",
+            closingMeanings = tr("Then let's meet at 3.", "Entonces nos vemos a las 3.", "Alors, retrouvons-nous à 15 h.", "Vậy gặp nhau lúc 3 giờ nhé.", "งั้นเจอกันตอน 3 โมงนะ", "Kalau begitu, kita bertemu jam 3."),
+        ),
+        ConversationLesson(
+            id = "feelings",
+            situation = tr("Talking about how you feel", "Hablar de cómo se siente", "Parler de son état", "Nói về cảm xúc và trạng thái", "พูดถึงความรู้สึก", "Membicarakan perasaan"),
+            partnerLine = "오늘 기분 어때요?",
+            partnerMeanings = tr("How do you feel today?", "¿Cómo se siente hoy?", "Comment vous sentez-vous aujourd'hui ?", "Hôm nay bạn cảm thấy thế nào?", "วันนี้รู้สึกยังไง?", "Bagaimana perasaan Anda hari ini?"),
+            replies = listOf(
+                ConversationReply("good", "기분이 좋아요.", tr("I feel good.", "Me siento bien.", "Je me sens bien.", "Tôi cảm thấy vui.", "รู้สึกดีค่ะ/ครับ", "Saya merasa senang.")),
+                ConversationReply("tired", "조금 피곤해요.", tr("I'm a little tired.", "Estoy un poco cansado.", "Je suis un peu fatigué.", "Tôi hơi mệt.", "เหนื่อยนิดหน่อยค่ะ/ครับ", "Saya sedikit lelah.")),
+                ConversationReply("worried", "조금 걱정돼요.", tr("I'm a little worried.", "Estoy un poco preocupado.", "Je suis un peu inquiet.", "Tôi hơi lo.", "กังวลนิดหน่อยค่ะ/ครับ", "Saya sedikit khawatir.")),
+            ),
+            closingLine = "그래요? 오늘은 푹 쉬세요.",
+            closingMeanings = tr("I see. Get some good rest today.", "Entiendo. Descanse bien hoy.", "Je vois. Reposez-vous bien aujourd'hui.", "Vậy à? Hôm nay nghỉ ngơi thật tốt nhé.", "อย่างนั้นเหรอ วันนี้พักผ่อนให้เต็มที่นะ", "Begitu ya? Istirahatlah dengan baik hari ini."),
         )
     )
 }
