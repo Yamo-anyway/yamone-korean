@@ -18,6 +18,7 @@ import com.yamone.korean.navigation.learningDestinations
 internal fun HomeProgressSummary(
     languageCode: String?,
     learningProgress: LearningProgressState,
+    onOpenStage: (com.yamone.korean.navigation.AppDestination) -> Unit,
     onOpenReview: () -> Unit,
 ) {
     val currentTitle = learningDestinations
@@ -55,4 +56,10 @@ internal fun HomeProgressSummary(
             }
         }
     }
+
+    StageProgressBreakdown(
+        languageCode = languageCode,
+        learningProgress = learningProgress,
+        onOpenStage = onOpenStage,
+    )
 }
