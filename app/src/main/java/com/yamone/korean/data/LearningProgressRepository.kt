@@ -58,6 +58,8 @@ class LearningProgressRepository(private val context: Context) {
 
     suspend fun markLessonForReview(lessonId: String) {
         context.learningProgressDataStore.edit { preferences ->
+            preferences[COMPLETED_LESSON_IDS_KEY] =
+                preferences[COMPLETED_LESSON_IDS_KEY].orEmpty() - lessonId
             preferences[REVIEW_LESSON_IDS_KEY] =
                 preferences[REVIEW_LESSON_IDS_KEY].orEmpty() + lessonId
         }
@@ -67,6 +69,14 @@ class LearningProgressRepository(private val context: Context) {
         context.learningProgressDataStore.edit { preferences ->
             preferences[REVIEW_LESSON_IDS_KEY] =
                 preferences[REVIEW_LESSON_IDS_KEY].orEmpty() - lessonId
+
+            if (lessonId.startsWith("syllable_")) {
+                preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY] =
+                    preferences[MASTERED_SYLLABLE_LESSON_IDS_KEY].orEmpty() + lessonId
+            } else {
+                preferences[COMPLETED_LESSON_IDS_KEY] =
+                    preferences[COMPLETED_LESSON_IDS_KEY].orEmpty() + lessonId
+            }
         }
     }
 
