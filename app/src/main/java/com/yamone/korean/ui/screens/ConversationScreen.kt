@@ -70,6 +70,7 @@ fun ConversationScreen(
     completedLessonIds: Set<String>,
     onLessonOpened: (String) -> Unit,
     onLessonCompleted: (String) -> Unit,
+    onLessonNeedsReview: (String) -> Unit,
     onContinue: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -122,6 +123,7 @@ fun ConversationScreen(
 
         val lessonId = "conversation_${lesson.id}"
         if (result.resultCode != Activity.RESULT_OK) {
+            onLessonNeedsReview(lessonId)
             statusMessage = ui.canceledLabel
             activeLesson = null
             activeReply = null
@@ -146,6 +148,8 @@ fun ConversationScreen(
 
         if (similarity >= CONVERSATION_PASSING_SIMILARITY) {
             readyForClosing = readyForClosing + lessonId
+        } else {
+            onLessonNeedsReview(lessonId)
         }
 
         activeLesson = null
