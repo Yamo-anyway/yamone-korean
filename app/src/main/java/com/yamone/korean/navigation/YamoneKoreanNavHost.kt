@@ -117,6 +117,12 @@ fun YamoneKoreanNavHost(
                             if (destination == AppDestination.Speaking) {
                                 guidedSentenceId = null
                             }
+                            if (
+                                destination == AppDestination.Expression ||
+                                destination == AppDestination.Conversation
+                            ) {
+                                reviewFocusLessonId = null
+                            }
                             onStageOpened(next.route)
                             navController.navigate(next.route)
                         }
