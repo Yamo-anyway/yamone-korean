@@ -313,6 +313,31 @@ fun YamoneKoreanNavHost(
                         ReviewScreen(
                             languageCode = initialLanguageCode,
                             reviewLessonIds = learningProgress.reviewLessonIds,
+                            onPracticeLesson = { lessonId ->
+                                scope.launch {
+                                    val target = when {
+                                        lessonId.startsWith("listening_") -> {
+                                            guidedSentenceId = lessonId.removePrefix("listening_")
+                                            AppDestination.Listening
+                                        }
+                                        lessonId.startsWith("speaking_") -> {
+                                            guidedSentenceId = lessonId.removePrefix("speaking_")
+                                            AppDestination.Speaking
+                                        }
+                                        lessonId.startsWith("expression_") -> AppDestination.Expression
+                                        lessonId.startsWith("conversation_") -> AppDestination.Conversation
+                                        lessonId.startsWith("word_") -> AppDestination.Word
+                                        lessonId.startsWith("sentence_") -> {
+                                            guidedSentenceId = lessonId
+                                            AppDestination.Sentence
+                                        }
+                                        else -> AppDestination.Syllable
+                                    }
+                                    onStageOpened(target.route)
+                                    onLessonOpened(target.route, lessonId)
+                                    navController.navigate(target.route)
+                                }
+                            },
                             onReviewResolved = { lessonId ->
                                 scope.launch {
                                     onReviewResolved(lessonId)
