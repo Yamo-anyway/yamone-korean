@@ -49,12 +49,16 @@ fun SentenceScreen(
     onContinue: () -> Unit,
 ) {
     val ui = sentenceUiText(languageCode)
-    val orderedLessons = remember(focusLessonId) {
-        if (focusLessonId == null) {
+    val entryLessonId = remember(focusLessonId) {
+        focusLessonId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { it.id !in completedLessonIds }?.id
+    }
+    val orderedLessons = remember(entryLessonId) {
+        if (entryLessonId == null) {
             BasicSentenceCatalog.lessons
         } else {
             BasicSentenceCatalog.lessons.sortedBy { lesson ->
-                if (lesson.id == focusLessonId) 0 else 1
+                if (lesson.id == entryLessonId) 0 else 1
             }
         }
     }

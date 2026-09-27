@@ -49,6 +49,18 @@ fun WordScreen(
 ) {
     val ui = wordUiText(languageCode)
     val revealed = remember { mutableStateMapOf<String, Boolean>() }
+    val firstPendingLessonId = remember {
+        BasicWordCatalog.lessons.firstOrNull { it.id !in completedLessonIds }?.id
+    }
+    val orderedLessons = remember(firstPendingLessonId) {
+        if (firstPendingLessonId == null) {
+            BasicWordCatalog.lessons
+        } else {
+            BasicWordCatalog.lessons.sortedBy { lesson ->
+                if (lesson.id == firstPendingLessonId) 0 else 1
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -69,7 +81,7 @@ fun WordScreen(
         }
 
         items(
-            items = BasicWordCatalog.lessons,
+            items = orderedLessons,
             key = { it.id },
         ) { lesson ->
             WordLessonCard(

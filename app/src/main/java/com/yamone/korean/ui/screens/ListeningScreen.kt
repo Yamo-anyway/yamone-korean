@@ -51,12 +51,18 @@ fun ListeningScreen(
 ) {
     val context = LocalContext.current
     val ui = listeningUiText(languageCode)
-    val orderedLessons = remember(focusSentenceId) {
-        if (focusSentenceId == null) {
+    val entrySentenceId = remember(focusSentenceId) {
+        focusSentenceId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
+                "listening_${lesson.id}" !in completedLessonIds
+            }?.id
+    }
+    val orderedLessons = remember(entrySentenceId) {
+        if (entrySentenceId == null) {
             BasicSentenceCatalog.lessons
         } else {
             BasicSentenceCatalog.lessons.sortedBy { lesson ->
-                if (lesson.id == focusSentenceId) 0 else 1
+                if (lesson.id == entrySentenceId) 0 else 1
             }
         }
     }

@@ -63,12 +63,18 @@ fun SpeakingScreen(
 ) {
     val context = LocalContext.current
     val ui = speakingUiText(languageCode)
-    val orderedLessons = remember(focusSentenceId) {
-        if (focusSentenceId == null) {
+    val entrySentenceId = remember(focusSentenceId) {
+        focusSentenceId
+            ?: BasicSentenceCatalog.lessons.firstOrNull { lesson ->
+                "speaking_${lesson.id}" !in completedLessonIds
+            }?.id
+    }
+    val orderedLessons = remember(entrySentenceId) {
+        if (entrySentenceId == null) {
             BasicSentenceCatalog.lessons
         } else {
             BasicSentenceCatalog.lessons.sortedBy { lesson ->
-                if (lesson.id == focusSentenceId) 0 else 1
+                if (lesson.id == entrySentenceId) 0 else 1
             }
         }
     }
