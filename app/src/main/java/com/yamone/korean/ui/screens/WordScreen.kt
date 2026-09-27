@@ -162,6 +162,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "Lugares",
             WordCategory.TIME to "Tiempo",
             WordCategory.ACTION to "Acciones",
+            WordCategory.QUESTION to "Preguntas",
+            WordCategory.HEALTH to "Salud",
         )
         "fr" -> mapOf(
             WordCategory.PEOPLE to "Personnes",
@@ -169,6 +171,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "Lieux",
             WordCategory.TIME to "Temps",
             WordCategory.ACTION to "Actions",
+            WordCategory.QUESTION to "Questions",
+            WordCategory.HEALTH to "Santé",
         )
         "vi" -> mapOf(
             WordCategory.PEOPLE to "Con người",
@@ -176,6 +180,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "Địa điểm",
             WordCategory.TIME to "Thời gian",
             WordCategory.ACTION to "Hành động",
+            WordCategory.QUESTION to "Từ hỏi",
+            WordCategory.HEALTH to "Sức khỏe",
         )
         "th" -> mapOf(
             WordCategory.PEOPLE to "ผู้คน",
@@ -183,6 +189,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "สถานที่",
             WordCategory.TIME to "เวลา",
             WordCategory.ACTION to "การกระทำ",
+            WordCategory.QUESTION to "คำถาม",
+            WordCategory.HEALTH to "สุขภาพ",
         )
         "id" -> mapOf(
             WordCategory.PEOPLE to "Orang",
@@ -190,6 +198,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "Tempat",
             WordCategory.TIME to "Waktu",
             WordCategory.ACTION to "Tindakan",
+            WordCategory.QUESTION to "Pertanyaan",
+            WordCategory.HEALTH to "Kesehatan",
         )
         else -> mapOf(
             WordCategory.PEOPLE to "People",
@@ -197,6 +207,8 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
             WordCategory.PLACE to "Places",
             WordCategory.TIME to "Time",
             WordCategory.ACTION to "Actions",
+            WordCategory.QUESTION to "Question words",
+            WordCategory.HEALTH to "Health",
         )
     }
     return labels.getValue(category)
@@ -204,7 +216,7 @@ private fun categoryLabel(category: WordCategory, languageCode: String?): String
 
 private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) {
     "es" -> WordUiText(
-        title = "20 palabras esenciales",
+        title = "Palabras coreanas esenciales",
         intro = "Lee primero el coreano. Separa las sílabas, intenta recordar el significado y luego compruébalo.",
         showMeaning = "Ver significado",
         learned = "Ya la sé",
@@ -212,7 +224,7 @@ private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) 
         continueLabel = "Ir a frases",
     )
     "fr" -> WordUiText(
-        title = "20 mots essentiels",
+        title = "Mots coréens essentiels",
         intro = "Lis d'abord le coréen. Observe les syllabes, devine le sens, puis vérifie.",
         showMeaning = "Voir le sens",
         learned = "Je connais",
@@ -220,7 +232,7 @@ private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) 
         continueLabel = "Passer aux phrases",
     )
     "vi" -> WordUiText(
-        title = "20 từ thiết yếu",
+        title = "Từ tiếng Hàn thiết yếu",
         intro = "Đọc tiếng Hàn trước. Nhìn cách tách âm tiết, thử nhớ nghĩa rồi mới kiểm tra.",
         showMeaning = "Xem nghĩa",
         learned = "Tôi đã nhớ",
@@ -228,7 +240,7 @@ private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) 
         continueLabel = "Sang câu",
     )
     "th" -> WordUiText(
-        title = "คำพื้นฐาน 20 คำ",
+        title = "คำภาษาเกาหลีที่จำเป็น",
         intro = "อ่านภาษาเกาหลีก่อน ดูการแบ่งพยางค์ ลองนึกความหมาย แล้วค่อยตรวจคำแปล",
         showMeaning = "ดูความหมาย",
         learned = "จำได้แล้ว",
@@ -236,7 +248,7 @@ private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) 
         continueLabel = "ไปเรียนประโยค",
     )
     "id" -> WordUiText(
-        title = "20 kata penting",
+        title = "Kata bahasa Korea penting",
         intro = "Baca bahasa Korea terlebih dahulu. Lihat pemisahan suku kata, tebak artinya, lalu periksa.",
         showMeaning = "Lihat arti",
         learned = "Saya sudah hafal",
@@ -244,7 +256,7 @@ private fun wordUiText(languageCode: String?): WordUiText = when (languageCode) 
         continueLabel = "Lanjut ke kalimat",
     )
     else -> WordUiText(
-        title = "20 essential Korean words",
+        title = "Essential Korean words",
         intro = "Read the Korean first. Notice the syllable blocks, recall the meaning, then reveal it.",
         showMeaning = "Show meaning",
         learned = "I know this",

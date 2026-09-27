@@ -6,6 +6,8 @@ enum class WordCategory {
     PLACE,
     TIME,
     ACTION,
+    QUESTION,
+    HEALTH,
 }
 
 data class BasicWordLesson(
@@ -41,6 +43,20 @@ object BasicWordCatalog {
         BasicWordLesson("word_meogeoyo", WordCategory.ACTION, "먹어요", "먹 · 어 · 요", translations("eat / am eating", "comer / como", "manger / je mange", "ăn", "กิน", "makan")),
         BasicWordLesson("word_bwayo", WordCategory.ACTION, "봐요", "봐 · 요", translations("see / look", "ver / mirar", "voir / regarder", "xem / nhìn", "ดู / มอง", "lihat")),
         BasicWordLesson("word_joahaeyo", WordCategory.ACTION, "좋아해요", "좋 · 아 · 해 · 요", translations("like", "gustar", "aimer", "thích", "ชอบ", "suka")),
+        BasicWordLesson("word_ireum", WordCategory.PEOPLE, "이름", "이 · 름", translations("name", "nombre", "nom", "tên", "ชื่อ", "nama")),
+        BasicWordLesson("word_bibimbap", WordCategory.FOOD, "비빔밥", "비 · 빔 · 밥", translations("bibimbap", "bibimbap", "bibimbap", "bibimbap", "บิบิมบับ", "bibimbap")),
+        BasicWordLesson("word_seoulyeok", WordCategory.PLACE, "서울역", "서 · 울 · 역", translations("Seoul Station", "estación de Seúl", "gare de Séoul", "ga Seoul", "สถานีโซล", "Stasiun Seoul")),
+        BasicWordLesson("word_myeot_si", WordCategory.TIME, "몇 시", "몇 · 시", translations("what time", "qué hora", "quelle heure", "mấy giờ", "กี่โมง", "jam berapa")),
+        BasicWordLesson("word_juseyo", WordCategory.ACTION, "주세요", "주 · 세 · 요", translations("please give me", "deme, por favor", "donnez-moi, s'il vous plaît", "cho tôi / vui lòng", "ขอ...หน่อย", "tolong beri saya")),
+        BasicWordLesson("word_mwo", WordCategory.QUESTION, "뭐", "뭐", translations("what", "qué", "quoi", "gì", "อะไร", "apa")),
+        BasicWordLesson("word_eolma", WordCategory.QUESTION, "얼마", "얼 · 마", translations("how much", "cuánto", "combien", "bao nhiêu", "เท่าไหร่", "berapa")),
+        BasicWordLesson("word_eodi", WordCategory.QUESTION, "어디", "어 · 디", translations("where", "dónde", "où", "đâu", "ที่ไหน", "di mana")),
+        BasicWordLesson("word_eotteoke", WordCategory.QUESTION, "어떻게", "어 · 떻 · 게", translations("how", "cómo", "comment", "như thế nào", "อย่างไร", "bagaimana")),
+        BasicWordLesson("word_meori", WordCategory.HEALTH, "머리", "머 · 리", translations("head", "cabeza", "tête", "đầu", "หัว", "kepala")),
+        BasicWordLesson("word_apayo", WordCategory.HEALTH, "아파요", "아 · 파 · 요", translations("hurts", "duele", "avoir mal", "đau", "เจ็บ", "sakit")),
+        BasicWordLesson("word_dasi", WordCategory.ACTION, "다시", "다 · 시", translations("again", "otra vez", "encore", "lại", "อีกครั้ง", "lagi")),
+        BasicWordLesson("word_malhaeyo", WordCategory.ACTION, "말해요", "말 · 해 · 요", translations("say / speak", "decir / hablar", "dire / parler", "nói", "พูด", "berbicara")),
+        BasicWordLesson("word_mannayo", WordCategory.ACTION, "만나요", "만 · 나 · 요", translations("meet", "encontrarse", "se rencontrer", "gặp", "พบ", "bertemu")),
     )
 }
 
